@@ -4,7 +4,7 @@
 *Quality of Geolocation in Smartphones: Measurement, Analysis, and Limitations in Real-World Scenarios*  
 **Author:** Romain Mottet  
 **Institution:** École Polytechnique de Louvain (UCLouvain)  
-**Year:** 2024-2025  
+**Year:** 2025-2026  
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
