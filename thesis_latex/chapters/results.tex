@@ -1,0 +1,298 @@
+\chapter{Results}
+\label{chap:results}
+
+Fifteen sessions cover urban (Ixelles), suburban (Louvain-la-Neuve), and rural (Waha) sites. Results follow the three-stage pipeline. They validate RQ1 (GNSS via Garmin/EXIF) and RQ2 (LTE trilateration without GPS).
+
+\section{GNSS accuracy (RQ1, Stage 1)}
+\label{sec:gnss_results}
+
+Stage 1 pipeline compares smartphone and Garmin watch against EXIF waypoints. Data spans 15 sessions (N=63 waypoints).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\textwidth]{figure_02_device_comparison.pdf}
+\caption{Device accuracy across sessions.}
+\label{fig:gnss_devices}
+\end{figure}
+
+\subsection{Global device performance}
+
+Smartphone beats Garmin across metrics (Table~\ref{tab:gnss_global}). CEP reaches 5.61 m versus 8.32 m. R95 stays at 14.79 m against 20.81 m. RMSE measures 9.47 m compared to 11.99 m. Std Dev hits 5.86 m versus 7.06 m.
+
+\begin{table}[htbp]
+\centering
+\caption{Global accuracy (N=63 waypoints). From device\_comparison.csv.}
+\begin{tabular}{|l|ccccc|}
+\hline
+Device & CEP & R95 & RMSE & Mean & Std Dev \\
+\hline
+Smartphone & 5.61 & 14.79 & 9.47 & 7.45 & 5.86 \\
+Watch & 8.32 & 20.81 & 11.99 & 9.87 & 7.06 \\
+\hline
+\end{tabular}
+\label{tab:gnss_global}
+\end{table}
+
+\subsection{Inter-Device agreement}
+
+Both devices work at 866 timestamps (Table~\ref{tab:phone_watch}). They agree within 10 m at 68.0\% of cases. Median separation equals 7.7 m.
+
+\begin{table}[htbp]
+\centering
+\caption{Phone-watch agreement (N=866 timestamps). From phone\_watch\_agreement.csv.}
+\begin{tabular}{|l|r|}
+\hline
+Metric & Value \\
+\hline
+Agreement rate ($\leq$10 m) & 68.0\% \\
+Mean distance & 8.9 m \\
+Median distance & 7.7 m \\
+95th percentile distance & 20.0 m \\
+\hline
+\end{tabular}
+\label{tab:phone_watch}
+\end{table}
+
+\subsection{Environmental impact}
+
+Environment drives accuracy. Waha (rural) leads with smartphone CEP at 3.59 m and RMSE at 6.34 m. Ixelles (urban) matches median at CEP 5.62 m. Outliers jump to R95 29.11 m. LLN (suburban) sits between at CEP 8.21 m and R95 14.49 m.
+
+\begin{table}[htbp]
+\centering
+\caption{Accuracy by environment (meters). From location\_comparison.csv.}
+\begin{tabular}{|l|ccc|ccc|}
+\hline
+\multirow{2}{*}{Environment} & \multicolumn{3}{c|}{Smartphone} & \multicolumn{3}{c|}{Watch} \\
+\cline{2-7}
+ & CEP & R95 & RMSE & CEP & R95 & RMSE \\
+\hline
+Ixelles (N=18) & 5.62 & 29.11 & 11.58 & 10.82 & 25.31 & 15.41 \\
+LLN (N=24) & 8.21 & 14.49 & 9.88 & 7.02 & 20.21 & 12.41 \\
+Waha (N=21) & 3.59 & 9.86 & 6.34 & 5.01 & 10.87 & 7.16 \\
+\hline
+\end{tabular}
+\label{tab:gnss_env}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{figure_06_location_heatmap.pdf}
+\caption{Error heatmap by location.}
+\label{fig:gnss_locations}
+\end{figure}
+
+\subsection{Atmospheric conditions}
+
+Cloud cover raises variance. Clear skies (coverage 0) yield smartphone CEP 1.95 m. Overcast (coverage 5) pushes it to 8.21 m. The number of sample might be falsed by outliers but the general trends tend to increase when cloud coverage increase.
+
+\begin{table}[htbp]
+\centering
+\caption{Accuracy by cloud coverage (0=clear, 5=overcast). From cloud\_coverage\_comparison.csv.}
+\begin{tabular}{|c|cc|cc|}
+\hline
+Coverage & \multicolumn{2}{c|}{Smartphone} & \multicolumn{2}{c|}{Watch} \\
+ & CEP & R95 & CEP & R95 \\
+\hline
+0 & 1.95 & 5.03 & 4.68 & 8.66 \\
+1 & 3.76 & 6.39 & 4.45 & 5.26 \\
+2 & 7.22 & 29.11 & 10.82 & 24.81 \\
+3 & 5.69 & 9.97 & 6.82 & 20.11 \\
+4 & 4.31 & 12.16 & 7.61 & 14.19 \\
+5 & 8.21 & 12.61 & 8.82 & 20.21 \\
+\hline
+\end{tabular}
+\label{tab:cloud_effects}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{figure_04_cloud_coverage_trend.pdf}
+\caption{Accuracy by cloud coverage.}
+\label{fig:gnss_cloud}
+\end{figure}
+
+\section{LTE Positioning (RQ2)}
+\label{sec:lte_positioning}
+
+\subsection{Data quality assessment}
+\label{subsec:lte_data_quality}
+
+Tower coverage reached 100\% serving cell detection across all 15 experimental runs. Each session confirmed complete database representation for primary connections. Neighbor cell coverage varied widely by environment. Global average stood at 78.6\% across sessions. Ixelles (urban) recorded 79.4\%. LLN (suburban) achieved 92.75\%. Waha (rural) fell to 64.05\%.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/coverage_comparison.pdf}
+\caption{Tower Database Coverage by Environment.}
+\label{fig:tower_coverage_stage1}
+\end{figure}
+
+Disparities arise from CellMapper's crowd-sourced nature. Rural areas suffer lower contributor density and fewer recorded neighbor cells~\ref{annex:tower-database}
+
+In Ixelles, session \texttt{ixelle\_5} achieved only 70\% overall coverage with 10 total cells. Suburban LLN sessions averaged 95.3\% overall coverage. 
+
+Rural Waha showed high variability. Sessions \texttt{waha\_1} and \texttt{waha\_2} reached 100\% coverage (4 cells each). Yet \texttt{waha\_3}, \texttt{waha\_4}, and \texttt{waha\_5} recorded 33.33\%, 60\%, and 66.67\% respectively.
+
+Hybrid databases (\texttt{towers.json} (corrected using official Brussels/Wallonia permits) and \texttt{pci.json}) enabled these matches. Strict acceptance rules outperformed raw CellMapper, which previously yielded 1166~m RMSE on 50 ground-truth antennas~\ref{annex:tower-database}
+
+
+\subsubsection{Geometric Dilution of Precision (GDOP) analysis}
+
+Coverage quality constrains trilateration geometry directly. Ixelles (urban) data shows a bimodal GDOP distribution. About 70\% of solved positions reach GDOP values below 5 due to dense multi-sector tower topology in city centers. The other 30\% record GDOP above 20 in urban canyon segments with collinear towers along single street axes.
+
+Louvain-la-Neuve (suburban) and Waha (rural) datasets display poor geometry consistently. Multiple distinct cells appear per session, yet they originate from only two physical antennas. Near-collinear geometry between these towers generates extreme GDOP values, with means exceeding 2000 in LLN.
+
+Small distance estimation errors ($\epsilon$) amplify into large position errors through this geometry. The relation follows $\text{Position Error} \approx \text{GDOP} \times \epsilon$. Physical tower sparsity forms the main geometric bottleneck in suburban and rural trilateration accuracy.
+
+\subsection{Distance estimation results}
+\label{subsec:distance_estimation}
+
+This section evaluates distance estimation models from Stage~\ref{stage:lte-distance-regression}. Cross-validation identifies optimal regression formulas for Ixelles, Louvain-la-Neuve, and Waha environments. Validation against a baseline path-loss model uses real-world field data. Nonlinear regression shows accuracy gains over the baseline.
+
+\subsubsection{Model selection and formula derivation}
+
+Methodology trained regression models to estimate distance $d$ from LTE parameters RSRP, RSRQ, and EARFCN. Target variable was $y = \log_{10}(d_{\text{true}})$.
+
+Table~\ref{tab:lte_distance_best} lists best models per environment from Leave-One-File-Out cross-validation. Selection minimized MAE while limiting model complexity.
+
+Urban Ixelles used quadratic terms for signal power and quality. Suburban LLN and rural Waha included EARFCN interaction terms.
+
+\begin{table*}[htbp]
+\centering
+\caption{Best distance regression models per environment. MAE and RMSE reported in meters from log-space predictions.}
+\hspace*{-1cm}%
+\begin{tabular}{|l|l|c|c|}
+\hline
+\textbf{Environment} & \textbf{Best model features} & \textbf{MAE (m)} & \textbf{RMSE (m)} \\
+\hline
+Ixelles (Urban) & RSRP, RSRQ, RSRP², RSRQ² & 30.28 & 36.83 \\
+\hline
+LLN (Suburban) & RSRP, RSRQ, EARFCN, RSRP$\times$RSRQ & 137.50 & 160.60 \\
+\hline
+Waha (Rural) & RSRP, RSRQ, EARFCN, RSRP$\times$EARFCN & 111.93 & 125.61 \\
+\hline
+\end{tabular}
+\label{tab:lte_distance_best}
+\end{table*}
+
+\hspace{}
+
+\textbf{Optimal formulas for Stage 3:}
+
+\begin{itemize}
+\item \textbf{Urban (Ixelles):}
+\begin{equation}
+\log_{10}(d) = 0.92 - 0.018 \cdot \text{RSRP} - 0.051 \cdot \text{RSRQ} - 9.2 \cdot 10^{-5} \cdot \text{RSRP}^2 - 0.0017 \cdot \text{RSRQ}^2
+\end{equation}
+
+\item \textbf{Suburban (LLN):}
+\begin{equation}
+\log_{10}(d) = 2.67 + 0.0013 \cdot \text{RSRP} + 0.0079 \cdot \text{RSRQ} - 0.0003 \cdot \text{EARFCN}_k + 7.1 \cdot 10^{-5} \cdot (\text{RSRP} \cdot \text{RSRQ})
+\end{equation}
+
+\item \textbf{Rural (Waha):}
+\begin{equation}
+\log_{10}(d) = 0.94 - 0.0004 \cdot \text{RSRP} - 0.013 \cdot \text{RSRQ} + 1.23 \cdot \text{EARFCN}_k - 0.0005 \cdot (\text{RSRP} \cdot \text{EARFCN}_k)
+\end{equation}
+\end{itemize}
+
+
+\subsubsection{Validation against path loss}
+
+To verify the robustness of these formulas, we implemented them in the full geolocation pipeline (Stage 3) and compared their distance estimates against a standard calibrated Path Loss model. The validation was performed across all collected traces, comparing the estimated distance to the ground truth Haversine distance between the serving cell tower and the device's GNSS position.
+
+The formula-based approach demonstrated a significant improvement in estimation accuracy over the traditional path loss model. As shown in Figure \ref{fig:method_comparison}, the global Mean Absolute Error (MAE) dropped from approximately 693 meters with the Path Loss model to just 91 meters with the Formula method.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{distance_mae_comparison.pdf}
+    \caption{Global comparison of distance estimation error between Path Loss and Formula methods.}
+    \label{fig:method_comparison}
+\end{figure}
+
+The Root Mean Square Error (RMSE) showed a similar trend (752 m vs 91 m). By removing the extreme outliers present in previous iterations, the baseline path loss model now reflects a more realistic performance (MAE $\approx$ 690-760 m), yet it remains nearly an order of magnitude less accurate than the formula-based approach.
+
+The performance advantage of the Formula method is consistent across all three urbanization levels:
+
+\begin{itemize}
+    \item \textbf{Ixelles (Urban):} The path loss model yielded an MAE of roughly 691 m. The density of urban towers ensures strong signals but also introduces complex reflections. The Formula method successfully modeled these complexities, reducing the MAE to 93 m.
+    \item \textbf{Louvain-la-Neuve (Suburban):} This environment remained the most challenging for the path loss model, with an MAE of 759 m. The complex mix of pedestrian zones and vegetation likely caused significant signal variance. The Formula method remained highly robust, achieving its best performance here with an MAE of 82 m.
+    \item \textbf{Waha (Rural):} The Formula method achieved an MAE of 137 m compared to the path loss baseline of 390 m. While the absolute improvement is smaller in meters compared to urban zones, the relative accuracy gain is still substantial ($\approx$ 65\% reduction in error).
+\end{itemize}
+
+A deeper analysis of per-cell errors demonstrates the stability of the regression approach. Figure \ref{fig:error_boxplot} presents the distribution of MAE for individual cell towers.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{distance_error_distribution.pdf}
+    \caption{Box plot of per-cell distance estimation errors. The Path Loss method exhibits high variability (interquartile range spanning hundreds of meters). The Formula method produces a tight, consistent error distribution with errors concentrated below 100 meters.}
+    \label{fig:error_boxplot}
+\end{figure}
+
+The path loss data is characterized by high variability, with an interquartile range spanning several hundred meters. In contrast, the Formula method constrains the error distribution significantly. The median error is lower, and the spread (variance) is much tighter, ensuring that no single cell introduces a massive bias into the positioning system.
+
+This consistency is critical for the subsequent trilateration stage. Even without extreme multi-kilometer outliers, the path loss model's variance (RMSE $\approx$ 750 m) is large enough to degrade positioning accuracy. The Formula method's ability to keep distance errors consistently low ($<$ 140 m on average) provides the high-quality inputs necessary for the precise trilateration discussed in the next section.
+
+\subsection{Trilateration and positioning results}
+\label{subsec:trilateration_results}
+
+Geolocation pipeline evaluated final positioning performance across three urbanization environments. Stage 2 distance estimates compared against Log-Distance Path Loss baseline for latitude/longitude accuracy.
+
+\subsubsection{Data completeness and sample statistics}
+\label{ssub:data_stats}
+Trilateration solver produced 2708 valid position estimates from 14 sessions. Ixelles generated 524 samples across 4 sessions. Louvain-la-Neuve yielded 1910 from 5 sessions. Waha provided 274 from 5 sessions. Sessions ixelle\_3, lln\_4, waha\_1 retained 2 of 8 contexts due to signal loss. Session waha\_5 captured 6 contexts after filtering. Eight contexts combined path\_loss and formula-based methods with city, town, village, default classifications.
+
+\subsubsection{Overall performance comparison}
+
+Table~\ref{tab:trilateration_overall} summarizes aggregate metrics across environments.
+
+\begin{table}[htbp]
+\centering
+\caption{Aggregate trilateration performance comparison (All Environments, N=2,708).}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Method} & \textbf{RMSE (m)} & \textbf{Mean Error (m)} & \textbf{Std Dev (m)} & \textbf{R95 (m)} \\
+\midrule
+Path Loss (Baseline) & 1181.0 & 1145.9 & 253.9 & 1360.5 \\
+Regression Formula & 537.1 & 527.1 & 85.6 & 646.7 \\
+\bottomrule
+\end{tabular}
+\label{tab:trilateration_overall}
+\end{table}
+
+Formula method reduced RMSE from 1181~m to 537~m (54.5\% improvement). Standard deviation dropped from 254~m to 86~m (66\% reduction).[21]
+
+\subsubsection{Performance by environmental context}
+
+Figure~\ref{fig:trilateration_rmse_context} compares RMSE across locations. Trilateration accuracy depends on distance estimation, network geometry, and tower availability. These factors create unique error profiles in each environment.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/trilateration_accuracy.pdf}
+\caption{RMSE comparison by environment, showing the impact of network geometry and model selection.}
+\label{fig:trilateration_rmse_context}
+\end{figure}
+
+\paragraph{Urban environment (Ixelles)}
+In Ixelles, both positioning methods achieve 166.0~m RMSE. High tower density creates short baselines between 200 and 800~m. This network density enables mutual error cancellation. Measurements from multiple angles counteract systematic multipath errors. Redundant data from approximately eight cells per epoch ensures well-conditioned geometry. Specifically, GDOP values remain at or below 8.0 in 70\% of positions, as detailed in Section ~\ref{ssub:data_stats}. Urban geometry defines the error floor here. Strict three-cell filtering excludes canyon segments with GDOP above 20.0.
+
+\paragraph{Suburban environment (Louvain-la-Neuve)}
+Suburban accuracy relies on distance model quality due to sparse tower distribution. The Path Loss model averages 1181~m RMSE. In contrast, the Formula method reaches 537~m RMSE. This 54.5\% improvement results from empirical regression capturing local propagation in mixed zones. Collinear tower placement in LLN causes high GDOP, which averages 1847. High GDOP amplifies small distance errors into kilometer-scale position deviations. The Formula method reduces distance Mean Absolute Error (MAE) from 759~m to 137.5~m. Accurate distance estimation significantly lowers the resulting geometric penalty.
+
+\paragraph{Rural environment (Waha)}
+Rural results converge at 691~m RMSE for both methods. Geographic and data completeness constraints dominate performance. Sparse tower distribution and database gaps limit neighbor cell availability.
+\begin{itemize}
+\item Coverage in sessions Waha\_3 to Waha\_5 ranges from 33\% to 66\% according to Section 5.2.1.
+\item The solver often relies on only 1 or 2 reference points due to these database gaps.
+\item Rural towers cluster along major roads, creating collinear geometry and high GDOP values.
+\end{itemize}
+Intersection error from two circles dominates distance uncertainty. Convergence at 691~m indicates that data scarcity determines the error limit in this environment. Geography dictates performance over methodology in these regions.
+
+\subsubsection{Cell availability and accuracy coupling}
+
+Suburban formula contexts varied by residential classification: village (290 samples, 506.2~m RMSE), town (284 samples, 549.1~m RMSE).[21] Urban village context reached 166.0~m RMSE across 135 samples for both methods. Rural convergence occurred at 691~m RMSE despite Stage 2 formula improvements.
+
+Trilateration accuracy limited by minimum of distance model quality and network geometry.
+
+\subsubsection{Forensic reliability assessment}
+
+R95 confidence interval reduced from 1360~m (Path Loss) to 646~m (Formula). Empirical modeling prevented catastrophic suburban failures common in forensic scenarios.

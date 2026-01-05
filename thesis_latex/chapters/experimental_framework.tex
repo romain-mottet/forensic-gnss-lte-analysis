@@ -1,0 +1,187 @@
+\chapter{Experimental Framework and Device Selection Journey}
+\label{ch:experimental_framework}
+
+\section{Overview: From Cellebrite to LineageOS}
+\label{sec:exp_overview}
+
+Initial plans targeted commercial forensic tools like Cellebrite. Ethical constraints required open-source alternatives. Multiple devices underwent testing, each encountering distinct technical barriers: encryption protection, firmware unavailability, operating system fragmentation, and bootloader restrictions.
+
+The final setup combines three data sources. G-NetTrack Pro logs continuous GNSS and network signals. Autopsy extracts discrete EXIF metadata from photos. Garmin Venu Sq 2 watch provides independent reference positioning.
+
+This approach delivers synchronized smartphone, network, and ground truth data across all test environments.
+
+\section{Part 1: Initial plan and ethical considerations}
+\label{sec:exp_ethics}
+
+\subsection{Original methodology}
+
+The initial research plan involved extracting geolocation traces from smartphones using Cellebrite UFED, a leading commercial forensic platform, then analyzing them in the laboratory at Charleroi's Police Judiciaire Fédérale. This approach would have replicated real forensic workflows used by law enforcement and provided data extraction methods closest to operational reality.
+
+\subsection{Ethical constraint}
+
+Charleroi lab had three active Cellebrite licenses. These ran nonstop on criminal cases. Academic use would divert resources from police operations and create unacceptable opportunity costs.
+
+Prioritizing personal research over active investigations violated ethics. The decision stood clear: develop alternative extraction methods that avoid competing with public safety work.
+
+\section{Part 2: Autopsy framework transition}
+\label{sec:exp_autopsy}
+
+\subsection{Rationale for change}
+
+Autopsy (version 4.22.1) provided a viable open-source alternative. Unlike Cellebrite, it required no licensing fees and ran independently of lab infrastructure.
+
+\subsection{Analysis workflow}
+
+The workflow used three steps: USB connection, image extraction, and metadata parsing.
+
+Devices connected via USB using Android Debug Bridge (adb). ADB pull command extracted images from phone memory to workstation. Autopsy then loaded the phone image data. ALEAPP module within Autopsy parsed Camera Photos EXIF data, including GPS coordinates captured at checkpoints, timestamps for alignment, and altitude values.
+
+\subsection{Autopsy capabilities and limitations}
+\label{sec:autopsy_limits}
+
+Autopsy 4.22.1 uses aLEAPP (Android) and iLEAPP (iOS) ingest modules. 
+These modules parse artifacts from phone storage images. 
+They process connected accounts, SMS/MMS messages, call logs, WiFi connections, Bluetooth pairings, browser history, installed applications, and selected app-specific databases.\cite{aleapp_doc,ileapp_doc}
+
+This case study identified geolocation evidence only from EXIF metadata in photographs. 
+Autopsy 4.22.1 extracted EXIF geolocation data and basic device configuration. 
+The tool failed to recover continuous GPS tracks, network logs, cell tower signals, or detailed network technology data.
+
+aLEAPP could not extract encrypted location search history from applications. 
+This limitation blocked access to traces not designed for geolocation. 
+Examples include browser history, application caches, search records, and communication artifacts.
+
+Autopsy provided only discrete image metadata from checkpoints. 
+It supplemented continuous positioning data collection but did not replace it.
+
+\section{Part 3: Device selection journey}
+\label{sec:exp_device_journey}
+
+\subsection{Samsung Galaxy A51 - Encryption barrier}
+\label{subsec:device_samsung}
+
+\textbf{Device specifications.} Samsung Galaxy A51 running Android 13, last security patch from 2022 (outdated). The device rooted successfully using standard tools.
+
+\textbf{Challenge encountered.} Samsung implements File-Based Encryption (FBE) on top of Android's standard encryption framework. The firmware includes vbmeta (verified boot metadata) that cryptographically prevents access to encrypted user data partitions, even when the device is physically rooted.
+
+Root access alone proved insufficient. Bootloader verification validates system and boot partition integrity before permitting data access. Without disabling vbmeta (which requires bootloader unlocking), encrypted data remained inaccessible. Device metrics and configuration files were readable; the actual geolocation database contents remained encrypted.
+
+\textbf{Decision.} Samsung's protective measures proved too robust for available tools and time constraints. A different manufacturer's device became necessary.
+
+\subsection{OnePlus Nord2 5G - Firmware availability problem}
+\label{subsec:device_oneplus_nord}
+
+\textbf{Device specifications.} OnePlus Nord2 5G originally shipped with Android 12. Security patches current as of November 5, 2024. Bootloader access was denied.
+
+\textbf{Rationale for selection.} OnePlus marketed the Nord2 5G as a "customizable and accessible phone" with explicit commitments to user-friendly modifications and open firmware access. This positioning made it an attractive candidate for research requiring root access and custom configurations.
+
+\textbf{Problem encountered.} OnePlus's public firmware availability declined progressively. For the Nord2 5G, official firmware downloads were either restricted or no longer available through standard channels. Additionally, Android 13 introduced significantly hardened bootloader security measures across the Android ecosystem, making bootloader unlock attempts increasingly difficult.
+
+An alternative approach attempted downgrading the device to Android 11, where bootloader access was reportedly less restrictive. However, older firmware versions required for downgrading no longer existed on OnePlus servers. Without firmware files, downgrade flashing became infeasible.
+
+\textbf{Contributing factors.} Removal of historical firmware repositories by the manufacturer, absence of third-party firmware hosting options with verified authenticity, and time constraints discouraging searches for leaked or mirrored firmware files.
+
+\textbf{Decision.} Abandon the Nord2 approach. A device with publicly available recent firmware and active community support became essential.
+
+\subsection{Huawei P8 - Android fragmentation issue}
+\label{subsec:device_huawei}
+
+\textbf{Device specifications.} Huawei P8 Lite 2017 running Android 7 (Nougat), last security patch from May 1, 2018. Rooting proved straightforward using standard tools.
+
+\textbf{Challenge encountered.} The Android version gap created insurmountable methodological problems. Between Android 7 (2016) and Android 13 (2022), the operating system underwent multiple architectural revisions \cite{Android2024VersionHistory}.
+
+Android 8 (Oreo) introduced foreground versus background process distinction, limiting background location access for power efficiency \cite{HyperTrack2020, Android2024Oreo}. Android 13 implemented granular geolocation permission controls and decoupled WiFi and Bluetooth scanning from location permissions, fundamentally changing how apps access positioning data \cite{Android2023Behavior, GeeksForGeeks2023, Esper2022}.
+
+Data extracted from Android 7 would represent geolocation behavior from nearly seven years prior and would not accurately reflect contemporary smartphone behavior. The experimental goal was understanding current geolocation quality, not historical trends.
+
+\textbf{Decision.} Device too outdated to provide meaningful contemporary data.
+
+\subsection{OnePlus 6T - Successful implementation}
+\label{subsec:device_oneplus_6t}
+
+\textbf{Device specifications.} OnePlus 6T originally shipped with Android 13. Upgraded to LineageOS 22.2 based on Android 15. Security patch current as of November 2025 (latest available). Rooted successfully using Magisk v29.0. Bootloader unlocked after considerable technical effort.
+
+\textbf{Success factors.} Three factors enabled successful implementation. First, the OnePlus 6T benefits from large and active development community. Comprehensive rooting guides, custom ROM documentation, and firmware mirrors are readily available. Second, bootloader unlocking, while requiring technical knowledge and persistence, had community resources providing detailed procedures that proved effective. Third, custom ROM (LineageOS 22.2) is actively maintained and receives current security updates.
+
+\textbf{LineageOS 22.2 configuration.} LineageOS 22.2 was selected as the base operating system. Modularity allows granular configurability of location services. Transparency through open-source codebase enables verification of data handling practices. Minimal bloatware reduces background processes that might interfere with controlled measurements. Enhanced granularity in location permission management improves privacy controls.
+
+\textbf{Location service configuration.} To isolate the impact of different geolocation methods, the following were disabled: WiFi scanning (preventing WiFi access point trilateration) and Bluetooth scanning (preventing BLE beacon-based localization).
+
+Remaining active location sources: GPS (Global Positioning System) and cellular network location (cell tower triangulation and 4G/LTE positioning). This configuration ensures measurement of only GPS and network-based localization, allowing direct comparison between satellite-based and cellular-based positioning accuracy.
+
+\textbf{Location permissions.} G-NetTrack Pro received the following permissions: notification access, file access, and location access while the application is active.
+
+\textbf{Development environment.} USB debugging was enabled solely for application installation. No special developer mode was activated. Device operated in standard user configuration.
+\begin{figure}[H]
+    \centering
+    \hspace*{-2cm}
+    \includegraphics[width=1.2\textwidth]{figures/workflow-phone.png}
+    \caption{Complete device selection workflow for mobile forensics analysis.}
+    \label{fig:device-workflow}
+\end{figure}
+\newpage
+\section{Final Configuration}
+\label{sec:exp_final_config}
+
+\subsection{Hardware setup}
+
+The production environment integrated four components. 
+
+OnePlus 6T smartphone ran LineageOS 22.2 (Android 15, November 2025 patch level). 
+The phone used Magisk v29.0 for rooting. 
+
+G-NetTrack Pro v3.75 logged continuous cellular and GPS data on the phone. 
+
+Garmin Venu Sq 2 smartwatch provided independent ground truth positioning. 
+
+Autopsy 4.22.1 workstation extracted EXIF metadata from images.
+
+\subsection{Data collection tools}
+
+\textbf{G-NetTrack Pro v3.75.} Primary tool for continuous geolocation and cellular measurements. Configured with 1-second intervals, verbose mode, cell info logging, IMSI/IMEI reporting, and network technology recording. Installed via external APK.
+
+Each session produces tab-delimited logs with 200-2000 entries. Fields include timestamp (ms precision), latitude, longitude, altitude, speed, bearing, accuracy, serving cell (CID, LAC, CGI), operator, network type (LTE/GSM), RSRP, RSRQ, RSSI, timing advance, and up to 18 neighbor cells per record.
+
+
+\textbf{Garmin Venu Sq 2.} Consumer-grade GNSS receiver serving as independent ground truth reference. Garmin GPS receivers are accurate to within 15 meters 95\% of the time under clear sky conditions \cite{Garmin2024}. Typical accuracy ranges from 3-10 meters \cite{Garmin2024}. Venu Sq 2 supports single-band GPS with GLONASS and Galileo constellation support \cite{The5KRunner2022}.  Configured to record GPS data at 6-second intervals.
+
+\textbf{Autopsy 4.22.1.} EXIF metadata extraction from checkpoint photographs. Extracted image files via adb from device storage, parsed GPS coordinates, timestamps, altitude, and confidence metrics from EXIF metadata.
+
+\textbf{Custom data processing scripts.} Python pipeline processes raw logs through three main stages.
+
+\begin{itemize}[noitemsep]
+\item \textbf{Network analysis:} Parses logs, verifies coverage, extracts signals, calculates distances, computes bearings, trilaterates, validates results.
+\item \textbf{GPS comparison:} Parses Garmin data, aligns trajectories, flags quality issues, merges datasets, computes errors, analyzes cloud effects, creates visualizations.
+\item \textbf{Distance regression:} Pairs measurements with towers, trains models, selects best performer, exports formulas.
+\end{itemize}
+
+Code: \url{https://github.com/romain-mottet/forensic-gnss-lte-analysis}
+
+\section{Key lessons for replication}
+\label{sec:exp_lessons}
+
+\subsection{Device selection criteria}
+
+Researchers attempting to replicate this work should prioritize several device characteristics.
+
+\begin{itemize}[noitemsep]
+\item \textbf{Active community support.} OnePlus, Motorola, Xiaomi devices have better documentation and firmware availability than niche manufacturers. Forums and rooting guides cut implementation time substantially.
+\item \textbf{Recent rooting tools.} Android rooting changes rapidly with new manufacturer security measures. Check Magisk compatibility and community forums before selection.
+\item \textbf{Operating system currency.} Pick devices with latest Android versions through official updates or custom ROMs. Devices over 4-5 years old lack modern behavior.
+\item \textbf{Firmware accessibility.} Verify firmware files on manufacturer servers and XDA Forums before purchase. Samsung and recent iPhones create encryption barriers.
+\item \textbf{Bootloader status.} Confirm bootloader unlock availability. OnePlus and Motorola permit unlocks. Apple and Samsung enforce permanent restrictions.
+\end{itemize}
+
+\subsection{Data collection considerations}
+
+6-second logging generates large datasets. Scripts handle parsing and timestamp alignment across sources. Initial stand-move-stand sequence synchronizes Garmin watch with phone logs reliably.
+
+Discrete checkpoint photos validate continuous data. EXIF metadata confirms accuracy at specific moments. Continuous logs reveal dynamic movement patterns.
+
+\subsection{Ground truth reference}
+
+Garmin Venu Sq 2 delivers 5-15 meter accuracy. Consumer GNSS receivers like this work well for relative smartphone comparisons. Consistency matters more than absolute position here.
+
+Professional surveying receivers hit sub-meter precision. Use these for true accuracy tests.
+
+Ground truth choice sets error analysis limits. Consumer gear compares smartphones fine. Forensic work demands high-accuracy references for defensible results.

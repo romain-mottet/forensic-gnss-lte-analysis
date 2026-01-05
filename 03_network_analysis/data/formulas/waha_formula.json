@@ -1,0 +1,26 @@
+{
+  "context": "waha",
+  "model": "I1 logd ~ rsrp + rsrq + earfcn_k + rsrp_x_earfcnk",
+  "description": "Nonlinear regression model with interaction term rsrp * earfcn_k",
+  "features": [
+    "rsrp",
+    "rsrq",
+    "earfcn_k",
+    "rsrp_x_earfcnk"
+  ],
+  "coefficients": {
+    "intercept": 0.9427406518174022,
+    "coef_rsrp": -0.00038182604391318,
+    "coef_rsrq": -0.012746148800098459,
+    "coef_earfcn_k": 1.225562847362623,
+    "coef_rsrp_x_earfcnk": -0.00049637385698948
+  },
+  "performance_metrics": {
+    "mae_mean_m": 111.9349290039709,
+    "rmse_mean_m": 125.61113314414172,
+    "mape_mean": 0.20363333586281515,
+    "folds": 5,
+    "train_samples": 402
+  },
+  "notes": "earfcn_k = EARFCN / 1000. Interaction term: rsrp_x_earfcnk = rsrp * earfcn_k"
+}

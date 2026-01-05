@@ -1,0 +1,196 @@
+\chapter{Conclusion}
+\label{ch:conclusion}
+
+\section{Key findings}
+\label{sec:conclusion_findings}
+
+This thesis examined smartphone geolocation reliability across three Belgian environments. The analysis addressed two research questions. RQ1 assessed GNSS accuracy against ground truth references. RQ2 evaluated LTE network positioning without GPS data.
+
+\subsection*{RQ1: GNSS accuracy across environmental contexts}
+
+Environment determines GNSS location trace quality for forensic use. The OnePlus 6T produced a global CEP of 5.61\,m across all measurements. Results varied significantly by location type.
+
+Rural Waha positioning reached CEP 3.59\,m and RMSE 6.34\,m. These values support precise timeline reconstruction in investigations.
+
+Urban Ixelles achieved median CEP 5.62\,m, matching rural medians. Outlier errors reached R95 29.11\,m due to canyon multipath effects.
+
+Suburban Louvain-la-Neuve showed CEP 8.21\,m and R95 14.49\,m. Mixed of building density and narrow street created intermediate challenges.
+
+Smartwatch comparisons confirmed reliability. 68.0\% of synchronized measurements stayed within 10\,m. Median separation measured 7.7\,m. Dual consumer devices thus corroborate geolocation evidence effectively.
+
+\subsection*{RQ2: LTE network positioning as GPS-fallback}
+
+LTE signal strength enables location estimation without satellite data. Investigators apply this method when GPS fails or devices disable positioning. Analysis created environment-specific RSRP distance models.
+
+Models to evaluate distance to the cell achieved MAE 30.28\,m in urban areas, 137.50\,m in suburban zones, and 111.93\,m in rural locations.
+
+Trilateration using these models outperformed path loss baselines. Suburban RMSE dropped 54.5\% from 1181\,m to 537\,m. 95\% confidence radius improved from 1360\,m to 647\,m.
+
+Urban trilateration matched baseline RMSE at 166\,m. Tower geometry limited rural performance to RMSE 691\,m in both methods.
+
+LTE positioning reveals movement patterns across coverage areas. Evidence excludes impossible travel timelines through tower handoffs. General area presence becomes confirmable. Precise crime scene claims require additional corroboration.
+
+
+\subsection*{Forensic evidence interpretation framework}
+
+Casey's three-phase framework guides location trace analysis through production, persistence, and investigation stages. This research classifies evidence by source reliability:
+
+\textbf{Primary evidence:} GNSS coordinates from smartphone logs or forensic extraction serve as primary traces. Quantified CEP/R95 values establish accuracy margins for timelines and proximity claims. Environment-stratified metrics communicate confidence directly to investigators and courts.
+
+\textbf{Secondary evidence:} LTE positioning derives from routine signal measurements. These traces support movement patterns and exclusion claims. Precise location assertions demand corroboration from other sources.
+
+\textbf{Environmental context:} Environment classification determines accuracy weight. Rural GNSS positioning carries greater evidentiary value than urban GNSS. Urban R95 outliers reach 29\,m. Multipath uncertainty accompanies median accuracy statements in testimony.
+
+\subsection*{Research question Rresolution}
+
+\paragraph{RQ1 Resolution}
+GNSS accuracy varies with environment. Rural areas deliver CEP 3.59\,m. Urban medians produce CEP 5.62\,m despite outlier challenges. Suburban conditions yield CEP 8.21\,m. Belgian courts gain empirical baselines for positioning evidence admissibility through these quantified metrics.
+
+\paragraph{RQ2 Resolution}
+LTE trilateration reconstructs position absent GPS signals. Results show environmental dependence. Suburban analysis achieves RMSE 537\,m alongside 95\% radius 647\,m. Urban tower geometry maintains RMSE 166\,m. Rural cell sparsity limits positioning to broad area confirmation. Investigators combine methods for robust forensic conclusions.
+
+
+\section{Contributions}
+\label{sec:conclusion_contributions}
+
+This work delivers three advances in smartphone forensic geolocation. Measurements establish environmental-stratified GNSS accuracy baselines. Regression-based LTE trilateration quantifies network positioning limits. Open-source code enables investigator replication.
+
+\subsection*{Contribution 1: Belgian-stratified GNSS accuracy baseline}
+
+No prior study measures smartphone GNSS accuracy systematically across Belgian urbanization levels. Isolated measurements exist. \cite{merry2019smartphone} report 9.9\,m RMSE urban. \cite{tomastik2017horizontal} report 7.48\,m forest leaf-on and 2.11\,m open sky. \cite{oluwadare2024comparative} report 3.37\,m cadastral. None address suburban accuracy. Forensic cases span all environment types.
+
+This thesis provides first Belgian measurements with five-session validation per location. Rural CEP measures 3.59\,m. Urban CEP measures 5.62\,m. Suburban CEP measures 8.21\,m. Ground truth combines smartwatch data, EXIF coordinates, and physical waypoints. OnePlus 6T running Android 15 captures current GNSS capabilities.
+
+\subsection*{Contribution 2: First LTE regression-based trilateration for forensics}
+
+Prior LTE research focuses on signal prediction. \cite{alimpertis2019city} predict RSRP distributions (4.64\,dB RMSE). \cite{guggenheimer2024global} applies RF fingerprinting to cell-ID matching. \cite{prihodko2018machine} predicts RSRP time-series for handover optimization. No studies validate trilateration positioning accuracy. No studies quantify geographic error margins.
+
+This thesis develops empirical RSRP-to-distance regression models. Validation uses ground-truth coordinates through trilateration. Three environment-specific models emerge:
+
+\begin{itemize}[noitemsep]
+\item Urban: MAE 30.28\,m
+\item Suburban: MAE 137.50\,m
+\item Rural: MAE 111.93\,m
+\end{itemize}
+
+Trilateration reduces RMSE 54.5\% versus path loss baseline (1181\,m $\to$ 537\,m). Confidence radius improves from 1360\,m to 647\,m at 95\%. Variance reduction reaches 66\%. Suburban baseline fails at 1181\,m error; regression achieves 537\,m. Haversine distances validate formulas. Field tests cover three environments.
+
+\subsection*{Contribution 3: Open-Source framework for investigators}
+
+Modular Python framework enables geolocation validation. Three independent pipelines execute GNSS comparison, distance regression, and trilateration. CLI interface serves non-specialists. Tower database construction follows Annex ~\ref{annex:tower-database} template.
+
+Dataset appears on GitHub under MIT license. Smartphone measurements, smartwatch references, and cell tower locations accompany code. Scripts generate publication-quality plots and statistical tables. Documentation covers Sections 4.3 and Annex A.
+
+Local police apply framework to local networks. Investigators train models on regional data and establish testimony standards. Code produces CEP circles and error distributions for court use. Framework adapts to new locations without modification.
+
+
+\section{Limitations}
+\label{sec:conclusion_limitations}
+
+This thesis establishes GNSS and LTE baselines within defined experimental scope. Internal validity holds firm. External validity faces multiple constraints. Practitioners apply results within documented boundaries.
+
+\subsection*{Experimental design constraints}
+
+Single device testing limits generalizability. Only OnePlus 6T with LineageOS 22.2 (Android 15) underwent evaluation. Antenna design differences across manufacturers affect GNSS accuracy (Chapter 1.1.3.2).
+
+\begin{itemize}[noitemsep]
+\item Results exclude iPhone, Samsung Galaxy, Google Pixel devices
+\item Dual-frequency flagships (iPhone 15 Pro, Pixel 8 Pro) show different performance  
+\item Each device family requires independent forensic validation
+\end{itemize}
+
+Data collection occurred during 2025 academic year. GNSS constellation, Android 15 algorithms, and LTE infrastructure represent specific temporal snapshot. Continuous changes affect future applicability.
+
+\begin{itemize}[noitemsep]
+\item Constellation expansion alters GDOP characteristics
+\item Android 16 may modify positioning algorithms
+\item Tower deployments shift monthly across Belgium
+\item Seasonal foliage changes impact multipath unmeasured here
+\end{itemize}
+
+Field sessions lasted 15--30 minutes during daytime walking. Overnight positioning, stationary behavior, and diurnal satellite variation remain uncharacterized.
+
+\begin{itemize}[noitemsep]
+\item Daytime walking metrics exclude nighttime accuracy
+\item 24-hour alibis need overnight validation
+\item Stationary devices (vehicles, indoors) produce different error profiles
+\end{itemize}
+
+Garmin Venu Sq 2 smartwatch provides consumer-grade reference (5-10\,m accuracy). Professional surveying equipment (±1\,m) absent from validation chain (Chapter 1.2.1).
+
+\begin{itemize}[noitemsep]
+\item CEP values below 10\,m reflect reference limitations
+\item Multipath affects both devices simultaneously
+\item Survey-grade baseline needed for absolute accuracy claims
+\end{itemize}
+
+\subsection*{Validation \& ground truth limitations}
+
+EXIF waypoints derive from same smartphone GNSS receiver. Validation captures relative drift, not absolute systematic bias. OS algorithm errors and multipath affect both reference and test measurements equally.
+
+\begin{itemize}[noitemsep]
+\item Systematic bias detection impossible through circular validation
+\item Relative precision measurable; absolute accuracy unproven
+\item Professional RTK GNSS (±0.5\,m) establishes true ground truth
+\end{itemize}
+
+\subsection*{LTE positioning methodology limitations}
+
+Tower database covers 79.4--92.7\% of serving cells. 12-15\% lack coordinate data.
+
+\begin{itemize}[noitemsep]
+\item Positioning fails below 80\% tower coverage
+\item Rural RMSE 691\,m reflects partial database failure
+\item Neighbor visibility (60--90\%) constrains trilateration geometry
+\end{itemize}
+
+Path loss exponent fixed per frequency band. Model ignores terrain, vegetation, building materials.
+
+\begin{itemize}[noitemsep]
+\item MAE varies 2--3× across individual cells
+\item Seasonal foliage alters propagation unquantified
+\item Adaptive calibration improves distance estimation
+\end{itemize}
+
+RSRQ infers bearing confidence without validation. Multipath produces high RSRQ despite poor directionality.
+
+\begin{itemize}[noitemsep]
+\item Bearing errors (10-30\textdegree) uncalibrated
+\item Angle-of-arrival hardware needed for precision
+\end{itemize}
+
+Regression formulas overfit to three test locations. Retraining required for new regions.
+
+Timing Advance parameter excluded from analysis. TA measures direct round-trip delay, bypassing path loss uncertainty.
+
+Three locations insufficient for national baseline. Walloon results exclude Flemish, coastal, and Ardennes environments.
+
+
+\section{Future directions}
+\label{sec:conclusion_future}
+
+Future research should address these limitations through:
+\begin{itemize}[noitemsep]
+    \item \textbf{Cross-OS analysis:} Android vs iOS raw data accessibility and forensic reconstruction differences
+    \item \textbf{Vehicular testing:} Higher-speed measurements capturing frequent cell handovers for improved trilateration
+    \item \textbf{Multi-operator:} Proximus/Orange/Telenet comparison for PCI overlap and network effects
+    \item \textbf{Deep learning optimization:} Neural networks to auto-tune triangulation parameters and mitigate NLOS
+    \item \textbf{Hybrid positioning:} GPS + WiFi/Bluetooth fusion accuracy quantification
+    \item \textbf{Tower enhancement:} Antenna patterns, real-time CellMapper integration, 3D occlusion modeling
+    \item \textbf{Provider azimuth data integration:} Access operator tower antenna bearings and sector boundaries. Requires operator data standardization across Belgian providers and legal framework for evidence access.
+    
+\end{itemize}
+
+\newpage
+
+\section{Final remarks}
+\label{sec:conclusion_remarks}
+Completing this thesis felt much like hunting GNSS satellites in an urban canyon: technically challenging, frequently frustrating, and deeply rewarding when you finally achieve lock.
+
+Device selection proved the primary challenge. The Samsung Galaxy A51's encryption, OnePlus Nord2's deleted firmware, and Huawei P8's outdated Android taught a hard lesson: methodology matters little without the right hardware. Walking predetermined routes across Brussels, Louvain-la-Neuve, and Waha in -5°C rain, I probably looked like a suspicious character to my neighbors. Yet these field sessions proved invaluable, anchoring thousands of ground truth measurements.
+
+The findings reveal smartphone GNSS positioning with median errors of 4.9 m in open-sky, 8.7 m in suburban areas, and 15.2 m in urban canyons. LTE-based positioning achieved 166m accuracy in cities but converged at 691m in rural zones, revealing that geography enforces hard limits no algorithm can violate. These results demonstrate consumer-grade smartphones provide forensically relevant accuracy across diverse Belgian environments.
+
+This thesis contributes a necessary foundation for future research. Multiple device platforms, seasonal variations, and indoor scenarios remain unexplored. The hope is that this work eventually leads to comprehensive, standardized guidelines for smartphone positioning evidence in Belgian courts.
+
+To future researchers: prioritize device selection and validate relentlessly against multiple ground truth sources. And when multipath errors reach 29 meters in urban canyons, remember that forensics tolerates imperfection beautifully as long as uncertainty is explicit.

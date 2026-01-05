@@ -1,0 +1,26 @@
+{
+  "context": "lln",
+  "model": "I2 logd ~ rsrp + rsrq + earfcn_k + rsrp_x_rsrq",
+  "description": "Nonlinear regression model with interaction term rsrp * rsrq",
+  "features": [
+    "rsrp",
+    "rsrq",
+    "earfcn_k",
+    "rsrp_x_rsrq"
+  ],
+  "coefficients": {
+    "intercept": 2.6682636537666475,
+    "coef_rsrp": 0.0013441275505445324,
+    "coef_rsrq": 0.007880858746604984,
+    "coef_earfcn_k": -0.00031936501931168984,
+    "coef_rsrp_x_rsrq": 7.146324117282298e-05
+  },
+  "performance_metrics": {
+    "mae_mean_m": 137.495623153659,
+    "rmse_mean_m": 160.59738245958192,
+    "mape_mean": 0.8158741723822512,
+    "folds": 5,
+    "train_samples": 1071
+  },
+  "notes": "earfcn_k = EARFCN / 1000. Interaction term: rsrp_x_rsrq = rsrp * rsrq"
+}

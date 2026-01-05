@@ -1,0 +1,26 @@
+{
+  "context": "ixelle",
+  "model": "P3 logd ~ rsrp + rsrq + rsrp_sq + rsrq_sq",
+  "description": "Polynomial regression model with squared terms (no frequency dependency)",
+  "features": [
+    "rsrp",
+    "rsrq",
+    "rsrp_sq",
+    "rsrq_sq"
+  ],
+  "coefficients": {
+    "intercept": 0.9242995437240282,
+    "coef_rsrp": -0.01841681021414572,
+    "coef_rsrq": -0.0509733733718092,
+    "coef_rsrp_sq": -9.229171138488328e-05,
+    "coef_rsrq_sq": -0.0017392873625686925
+  },
+  "performance_metrics": {
+    "mae_mean_m": 30.27851788370412,
+    "rmse_mean_m": 36.83376243364908,
+    "mape_mean": 0.1844535805042956,
+    "folds": 4,
+    "train_samples": 334
+  },
+  "notes": "Polynomial terms: rsrp_sq = rsrp^2, rsrq_sq = rsrq^2. No earfcn_k dependency."
+}

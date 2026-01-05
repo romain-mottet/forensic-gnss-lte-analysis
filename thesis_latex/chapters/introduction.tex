@@ -1,0 +1,107 @@
+\chapter{Introduction}
+\label{ch:introduction}
+
+Smartphones now serve as the main geolocation tools worldwide, replacing dedicated GNSS receivers in daily use and forensic investigations. This thesis evaluates the reliability of smartphone positioning in police investigations, focusing on accuracy, precision, and consistency across different Belgian environments.
+
+The research combines controlled field measurements and signal analysis. It measures GNSS performance under varying environmental conditions and complements satellite data with LTE signal strength models to reconstruct locations without GPS. These methods reflect real forensic conditions where incomplete or degraded positioning data often occur.
+
+Geolocation quality depends on GNSS geometry, signal obstruction, multipath effects, sensor integration, and operating system algorithms such as those on Android devices. This introduction outlines the motivation, forensic relevance, research objectives, and structure of the thesis.
+
+\section{Motivation}
+\label{sec:intro_motivation}
+
+Navigation, fitness tracking, and location-based applications rely on smartphone positioning. In digital forensics, police increasingly use smartphone location data to confirm presence at crime scenes, assess alibis, and analyze movement patterns. Yet, clarity about actual accuracy across different conditions remains limited. Users, engineers, and legal professionals often misjudge what current devices can reliably deliver. Quantifying these limits is essential for designing dependable systems, setting informed user expectations, and defining objective standards for admissible geolocation evidence in Belgian courts.
+
+\subsection{Global context: Smartphone GNSS ubiquity}
+\label{subsec:intro_global_context}
+
+Over half the global population owns a smartphone as of 2023~\cite{GSMA2023SOMIC,ExplodingTopics2025}. Nearly 4 billion people access mobile internet via smartphones, accounting for 49\% of the world's population~\cite{GSMA2023SOMIC}. Global smartphone shipments have exceeded 7 billion units, with over 90\% of Android phones supporting raw GNSS measurements since Android 7 (2016)~\cite{GoogleAndroid2025}.
+
+The GNSS chip market reached USD 7.47 billion in 2023 and is projected to reach USD 11.53 billion by 2030 (CAGR 6.6\%)~\cite{PSMarketResearch2024}. Mobile technology contributed USD 6.5 trillion to global GDP in 2024~\cite{GSMA2025MobileEconomy}. Location-based services, entirely dependent on smartphone GNSS, reached USD 46.7 billion in 2024 and are projected to expand at a CAGR of 15.84\%, reaching USD 187 billion by 2033~\cite{IMARCGroup2024LBS}.
+
+Smartphones are systematically replacing dedicated GNSS receivers, with the handheld GPS receiver market projecting much slower growth: from USD 1.2 billion in 2024 to USD 2.4 billion by 2033~\cite{Marketintelo2025}. The European Commission mandates GNSS positioning for new smartphones, with over 95\% of chipsets supporting Galileo~\cite{MordorIntelligence2024}.
+
+Performance gaps between smartphones and professional surveying equipment remain substantial. Smartphone GNSS in forests yields RMSE of 4.5-11.4~m, compared to 1.2-1.4~m for survey-grade receivers~\cite{Tomastik2017}. Open-sky conditions improve smartphone error to 2.1~m, while survey receivers achieve 0.06~m~\cite{Tomastik2017}. Dual-frequency smartphones in kinematic mode report RMS errors of 3.2-4.9~m~\cite{Robustelli2021}. High-end models achieve approximately 4~m error, outperforming low-end models at 6~m~\cite{Petrella2025}.
+
+\subsection{Applications of smartphone geolocation}
+\label{subsec:intro_applications}
+
+Modern smartphones form the core of many location-based systems:
+\begin{itemize}[noitemsep]
+    \item Navigation and mapping tools
+    \item Fitness and health tracking
+    \item Ride-hailing and delivery platforms
+    \item Augmented reality applications
+    \item Social and contextual networking services
+\end{itemize}
+
+Each field demands a different level of accuracy. Commercial navigation functions effectively with errors of 3--5~m. Forensic work operates under stricter constraints. A 5~m deviation can decide whether location data confirm or contradict an alibi. Placing a device 8~m from a crime scene differs markedly from locating it 12~m away when assessing evidentiary consistency. This precision requirement defines the forensic threshold and drives the motivation for this research.
+
+\subsection{Challenges in real-world scenarios}
+\label{subsec:intro_challenges}
+
+Smartphone geolocation faces several practical challenges that degrade quality in operational environments.
+
+\subsubsection{Signal obstruction and multipath}
+
+Multipath occurs when satellite signals reach a receiver via direct and reflected paths simultaneously. Reflected signals bouncing off buildings, ground surfaces, and metallic structures interfere with direct signals, causing inaccurate position calculations. Code measurements are most vulnerable: intersecting direct and reflected signals cause 2--3~m errors, while only-reflected signals can cause errors of hundreds of meters~\cite{Peretic2025,Weng2023}. Multipath severity increases with urban canyon depth and symmetry. In urban canyons with tall buildings on both sides, multipath degradation is way worse than in asymmetric canyons~\cite{Peretic2025}.
+
+Signal obstruction is environmental and predictable. Open-sky environments exhibit minimal multipath. Suburban areas experience mild multipath. Urban environments (``urban canyons'') with tall buildings cause significant multipath leading to the largest errors~\cite{Peretic2025}.
+
+\subsubsection{Antenna design and device form factor}
+
+Smartphones are constrained by weight, cost, and aesthetic considerations. They typically incorporate low-cost GNSS receivers and antennas, increasing positioning errors compared to professional surveying equipment, which employs precisely engineered antenna phase centers and optimized ground planes. Optimal antenna shielding through ground plane design minimizes multipath: the optimal ground plane is approximately 1.5 times the signal wavelength. Smartphone design rarely accommodates such optimization due to form-factor trade-offs~\cite{Weng2023}.
+
+The human body itself becomes an obstruction. The user holding a smartphone blocks a portion of incoming GNSS signal. Smartphone antenna phase center location relative to device structure affects position accuracy, with largest variations aligned with major components (housing, active electronics)~\cite{Weng2023}.
+
+\subsubsection{Environmental variability and temporal factors}
+
+Sky visibility (the proportion of unobstructed sky) is a primary predictor of GNSS accuracy. Building heights, street widths, tree canopy coverage, time-of-day (affecting satellite geometry), and weather conditions (cloud cover, humidity) introduce temporal and environmental variability. Network-assisted positioning (A-GPS, SUPL) improves accuracy by 1--2~m in urban areas by downloading satellite orbital information from network servers~\cite{Zangenehnejad2021}. Custom ROM configurations (e.g., LineageOS) allow toggling network assistance, restricting GNSS constellations (GPS-only versus multi-constellation), and adjusting update rates, all of which affect reported coordinates.
+
+\subsection{Belgian forensic context: Legal and technical gap}
+\label{subsec:intro_belgian_context}
+
+Belgian judges and prosecutors increasingly utilize smartphone geolocation evidence in criminal investigations, yet rigorous standardized studies demonstrating its reliability and accuracy under defined conditions remain lacking~\cite{CrucibleLaw2024,ProvenData2024}. International research provides isolated measurements but no systematic comparison across Belgian urbanization levels. Most studies measure accuracy at single time points; few quantify precision across repeated days (essential for forensic credibility)~\cite{ProvenData2024,CriminalLegalNews2024}.
+The Belgian legal context compounds this technical gap. Belgium's data retention legislation has faced three constitutional challenges. The European Court of Justice ruled in 2021 that Belgium's blanket retention scheme violated European law~\cite{EDRI2024}. The Constitutional Court approved a revised 2022 version allowing selective retention in high-crime zones, but the judicial system lacks technical standards for validating accuracy and reliability of retained geolocation data~\cite{EDRI2024}. Legal authorization to collect geolocation data does not address the technical question: is position data accurate enough for forensic evidence?
+
+The 2023 Sky~ECC case demonstrates current practice. Belgian courts convicted suspects partly on location data derived from smartphone positioning without full technical vetting of uncertainty margins, environmental influences, or device reliability~\cite{Oerlemans2023}. The Belgian Data Protection Authority acknowledged that ``accuracy of geolocation data varies substantially depending on environmental factors'' but provided no quantitative guidance for expectations across environments~\cite{Stibbe2024a}. Under emerging European evidence standards (E-evidence Regulation entering force August 2026), cross-border digital evidence must meet rigorous reliability standards~\cite{Stibbe2024b}. Without Belgian-specific GNSS accuracy studies, Belgian courts risk convictions being challenged as insufficiently supported by validated technical evidence.
+\section{Research Questions}
+\label{sec:intro_research_questions}
+This thesis addresses two core research questions:
+\begin{itemize}[noitemsep]
+    \item \textbf{RQ1: How does smartphone GNSS accuracy compare to smartwatch and physical waypoint references?} This question evaluates the deviation between devices in urban (Ixelles), suburban (Louvain-la-Neuve), and rural (Waha) locations. It identifies which environment produces the most consistent coordinates for forensic reconstruction.
+    \item \textbf{RQ2: How effectively can LTE signal strength models estimate location without GPS?} This research develops empirical distance models using network signals to determine a device’s position independently. The analysis measures if these network-based methods provide sufficient precision when satellite signals are obstructed or unavailable.
+\end{itemize}
+These questions provide the quantitative data police need to verify suspect locations. Investigators must know if a specific coordinate reliably places a person at a crime scene or merely within a general area.
+\subsection{Scope and limitations}
+\label{subsec:intro_scope}
+
+This study focuses on consumer-grade Android smartphones (OnePlus 6T running LineageOS 22.2 with Android 15) using standard GNSS positioning APIs and GNSS capabilities. It does not cover specialized surveying-grade equipment, differential correction techniques beyond standard GNSS, or proprietary correction services.
+
+The experimental scope encompasses:
+\begin{itemize}[noitemsep]
+    \item three predefined $\approx$ 800 m walking routes in distinct Belgian urbanization environments
+    \item Five repetitions per location
+    \item Five predefined measurement stops per route
+    \item Horizontal accuracy and precision (repeatability) as primary metrics
+    \item Environmental and configuration factors as explanatory variables
+\end{itemize}
+
+Reference ground truth is established using a Garmin Venu Sq 2 consumer-grade watch (acknowledged as a study limitation; consumer-grade equipment has 5-10~m accuracy itself, not professional surveying-grade precision).
+
+\section{Thesis structure}
+\label{sec:intro_structure}
+
+The remainder of the thesis is organized as follows.
+
+\textbf{Chapter~\ref{ch:state_of_the_art}} reviews the state of the art on smartphone geolocation, GNSS signal processing, multipath effects, antenna design, and forensic evidence admissibility standards. It synthesizes international literature while emphasizing gaps specific to Belgian forensic contexts.
+
+\textbf{Chapter~\ref{ch:experimental_framework}} documents the journey from commercial forensic tools to open-source alternatives, detailing ethical constraints, device selection criteria, and the final hardware configuration. It provides replication guidance for future investigators navigating encryption barriers, firmware availability, and bootloader restrictions across manufacturer platforms.
+
+\textbf{Chapter~\ref{chap:methodology}} describes the three-stage experimental pipeline: GPS comparison against Garmin watch and EXIF waypoints, LTE distance regression through Leave-One-File-Out cross-validation, and network-based trilateration across four environmental contexts. Field protocols cover three Belgian environments (urban Ixelles, suburban Louvain-la-Neuve, rural Waha) with five repetitions per location and automated quality assurance mechanisms.
+
+\textbf{Chapter~\ref{chap:results}} presents GNSS accuracy metrics (CEP, R95, RMSE) stratified by environment and atmospheric conditions, validates LTE distance estimation via signal-to-tower regression, and quantifies trilateration positioning error relative to ground truth. Key findings establish baseline accuracy expectations and confidence intervals for forensic use.
+
+\textbf{Chapter~\ref{ch:conclusion}} synthesizes findings, establishes contributions to Belgian forensic standards, acknowledges experimental limitations, and proposes future research directions for improved positioning reliability and broader device validation.
+
+\newpage

@@ -1,0 +1,334 @@
+\chapter{State of the Art}
+\label{ch:state_of_the_art}
+
+\section{Forensics and digital investigation}
+\label{chstateoftheart}
+
+
+\subsection{Difference between mistake and error}
+\label{secsotamistakeerror}
+
+Forensic analysis separates operational failures into two distinct categories: mistakes and errors. A mistake is an unintentional incorrect result generated despite the presence of adequate safeguards \cite{Ryser2024}. The practitioner possesses the necessary knowledge but fails to apply the procedure correctly.
+
+Errors encompass any deviation from the true value. These discrepancies occur regardless of the investigator's skill level or procedural awareness \cite{Casey2020}. Digital forensics demands a rigorous focus on errors, as these deviations dictate the reliability of tools and the ultimate integrity of the evidence.
+
+Quality assurance strategies depend on this classification.
+\begin{itemize}
+    \item Mistakes can be resolved through training and refined workflows.
+    \item Errors represent measurement failures that require systematic investigation and may be irreducible.
+\end{itemize}
+
+Recognizing this distinction allows for targeted improvements and ensures accurate communication of forensic findings.
+
+
+
+\subsection{Three types of errors}
+\label{secsotaerrortypes}
+
+Forensic investigation and measurement include three error categories: systematic, random, and gross errors \cite{Brainkart2018}.
+
+\textbf{Systematic errors:} These errors create consistent inaccuracies in the same direction because of flaws in instruments or procedures \cite{Scribbr2023}. They move measurements away from the true value. In digital forensics, these errors often come from software bugs or tool limitations. Averaging multiple measurements does not fix this problem \cite{Brainkart2018}. Undetected systematic errors reduce accuracy and cause incorrect conclusions.
+
+\textbf{Random errors:} Unpredictable fluctuations in measurement cause random errors \cite{Brainkart2018}. They make data scatter around a mean value and affect precision.
+\begin{itemize}
+    \item Measurements vary in different directions.
+    \item Averaging results reduces the impact of these errors because opposite values cancel each other.
+    \item Using large sample sizes helps to minimize these effects \cite{Scribbr2023}.
+\end{itemize}
+
+\textbf{Gross errors:} These errors come from human mistakes, such as carelessness or lack of experience \cite{Brainkart2018}. They are usually large and easy to find with quality control. Examples include reading an instrument incorrectly or misinterpreting a result.
+
+In digital forensics, systematic errors happen more often than random errors due to tool design and standard procedures \cite{Nelson2015}. Investigators must find and reduce these errors by using validation tests and quality assurance rules.
+
+\subsection{What is a digital trace?}
+\label{secsotadigitaltrace}
+
+A digital trace is any information stored or transmitted in digital form that relates to events under investigation and can be secured, fixed, and decoded using forensic methods \cite{FIRST2019}. Digital traces encompass any changes in digitized environments that reflect activities relevant to investigation, including data objects and physical evidence recovered from digital devices.
+
+Locard's Exchange Principle applies to digital forensics: every contact leaves a trace, whether presence or absence of information \cite{FIRST2019}. Digital traces differ from physical traces in their volatility and complexity. They may be easily modified, deleted, or degraded without detection. Multiple independent formats may contain the same information, providing verification opportunities.
+
+The concept broadens forensic investigation beyond traditional physical evidence. A digital trace can originate from operating system logs, application data, metadata embedded in files, network communications, or hardware-level artifacts. Device interactions systematically generate traces. Understanding trace generation mechanisms, storage locations, and potential degradation pathways proves essential for proper evidence handling.
+
+\subsection{Definition of location trace}
+\label{secsotalocationtrace}
+
+A location trace is a digital artifact that records or implies where a device or user was at specific points in time. It can come from systems that explicitly capture position data or from data produced indirectly during normal device use. Forensic analysis relies on such traces to reconstruct movements, build timelines, and check proximity between a person and a place.
+
+Each location trace links spatial coordinates with a timestamp, forming a spatiotemporal record of device positions. Its reliability depends on the accuracy limits of the underlying positioning technology and on any degradation that occurs between creation and forensic extraction. Different positioning methods therefore generate traces with distinct accuracy and reliability profiles \cite{Magnetforensics2025}.
+
+In criminal investigations, location traces can support or challenge alibi statements, associate suspects with crime scenes, and reveal recurring behavioural patterns. Their value as evidence fully depends on how well investigators understand the technical and procedural mechanisms that produced them.
+
+\subsection{Three phases in location trace analysis}
+\label{secsotatracephases}
+
+Digital trace analysis follows three stages: production, persistence, and investigation \cite{Berger2024}.
+
+\subsubsection{Trace production}
+\label{subsecsotatraceproduction}
+
+Trace production includes the acquisition, processing, and storage of location data by a device. These mechanisms define the accuracy and completeness of the information. Devices often lose context during this stage by failing to record the specific positioning method or its estimated error \cite{Spichiger2023}. Risks include the storage of inaccurate coordinates and time synchronization errors without indicating these failures. Data may also become fragmented or corrupted within the storage structure before it can be retrieved.
+
+\subsubsection{Trace persistence}
+\label{subsecsotatracepersistence}
+
+Persistence refers to the recoverability of a trace after its creation. Digital traces are volatile and frequently disappear over time \cite{Berger2024}. This decay can create a false impression of completeness if some traces remain while others are lost.
+\begin{itemize}
+    \item Missing data results from failures in generation, preservation, or forensic recovery \cite{Berger2024}.
+    \item Storage limits and overwriting mechanisms reduce the lifespan of records.
+    \item Cloud synchronization and application pruning actively remove traces from local storage.
+\end{itemize}
+The absence of a location trace differs from proof of absence; it signifies that no data was successfully preserved \cite{Berger2024}.
+
+\subsubsection{Trace investigation}
+\label{subsecsotatraceinvestigation}
+
+The investigation phase focuses on extracting and parsing raw data into structured models for analysis \cite{Berger2024}. Success requires an investigator to understand device memory copies and the specific data models used by forensic tools. Because manufacturers frequently change database formats, tools must be regularly validated to ensure they do not ignore or misinterpret traces on newer devices \cite{Berger2024}.
+
+Reconstruction explains the existence of traces through hypothesis testing. Analysts must incorporate position accuracy into their evaluations to avoid reaching erroneous conclusions. Communicating uncertainty clearly at every stage remains essential for a reliable forensic interpretation \cite{Berger2024}.
+
+\subsection{Traces not designed for geolocation}
+\label{secsotanonpositioningtraces}
+
+Location information exists within various digital traces that were not primarily created for positioning.
+
+\textbf{EXIF metadata:} Smartphones and digital cameras automatically record EXIF metadata during image capture. These files include technical camera specifications, timestamps, exposure parameters, and geographical coordinates from GNSS \cite{Oikonomidis2019}. Geographic data typically uses a degrees, minutes, and seconds format. Conversion to decimal degrees follows this formula:
+\[
+\text{decimal degrees} = \text{degrees} + \frac{\text{minutes}}{60} + \frac{\text{seconds}}{3600}
+\]
+\cite{Oikonomidis2019}. Specialized tools such as ExifTool GUI and Metadata++ extract these geotags. Python libraries like Pillow enable the forensic extraction of location data and technical camera configurations directly from image files \cite{Oikonomidis2019}.
+
+\textbf{Metadata in digital artifacts:} Digital metadata includes descriptive, structural, administrative, and statistical information \cite{Oikonomidis2019}. 
+\begin{itemize}
+    \item Application data and documents embed timestamps that mark specific events.
+    \item These timestamps allow for cross-verification against independent timelines.
+    \item Document properties record creation locations or modification times that reveal user patterns.
+\end{itemize}
+
+\textbf{Messages and communication records:} Text messages, social media posts, and emails frequently contain location references within the text. Users may explicitly mention addresses or directions in their conversations. Navigation applications also record when a user shares a route or a destination. Social media platforms further encode positioning through check-ins and location tags \cite{Spichiger2023}.
+
+\textbf{Browser history and navigation applications:} Web browsers log visited URLs alongside precise timestamps. Navigation applications maintain extensive records of searched locations, planned routes, and actual paths traveled. Saved favorite locations and specific map views indicate direct user interaction with geographic data. Search queries for directions between two points confirm that a user considered those locations relevant to their activity.
+
+
+\subsection{Software analysis for mobile device forensics}
+\label{secsotasoftwareanalysis}
+
+\subsubsection{Encryption and security models}
+\label{subsecsotaencryptionoverview}
+
+Modern smartphones use strong encryption to protect data at rest. Android and iOS implement different security architectures to manage this protection.
+
+\textbf{Android encryption:} Android devices utilize either Full-Disk Encryption (FDE) or File-Based Encryption (FBE). FBE is the required standard for all devices launched with Android 10 or higher \cite{Samsung2024}. While FDE secures the entire user data partition with a single primary key, FBE encrypts individual files using unique keys derived from a primary key \cite{Samsung2024, Android2025}.
+\begin{itemize}
+\item FBE supports granular security through specific storage locations.
+\item Credential-encrypted storage remains locked until the user provides authentication.
+\item Device-encrypted storage is available immediately during Direct Boot mode \cite{Samsung2024, Android2025}.
+\item The Trusted Execution Environment (TEE) protects cryptographic keys within hardware-backed storage \cite{Technical2025}.
+\end{itemize}
+
+\textbf{iOS encryption:} iOS uses filesystem-level encryption that merges a unique hardware key (UID) with the user passcode \cite{Technical2025}. Files are assigned to different Data Protection classes, each providing a specific level of security. A dedicated hardware security processor called the Secure Enclave manages these cryptographic keys and enables biometric authentication \cite{Technical2025}. This processor keeps keys isolated from the main system to prevent software-based attacks. These protections make accessing encrypted data on modern iOS devices difficult for forensic investigators \cite{Technical2025}.
+
+\subsubsection{Commercial vs Open-Source forensic tools}
+\label{subsec:tool-comparison}
+
+Forensic teams in Charleroi balance extraction power against strict budget limits. Commercial tools offer speed. They handle encryption without requiring root access. Budget constraints restrict these licenses to a few shared units. Open-source alternatives cost nothing. They require root access. This risks evidence integrity. Charleroi police avoid them completely.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{|p{2.5cm}|p{4cm}|p{4cm}|p{4cm}|}
+\hline
+\textbf{Feature} & \textbf{Cellebrite UFED} & \textbf{Magnet AXIOM} & \textbf{Autopsy/TSK} \\
+\hline
+Extraction & Logical, filesystem, physical; no-root bypass & Express via Graykey (35-45 min) & Logical carving; root often required \\
+\hline
+Geolocation & Timeline mapping, LTE CSFB recovery \cite{Sutikno2024} & AI-triaged paths \cite{Magnetforensics2025} & EXIF/polyline decoding \cite{Sutikno2024} \\
+\hline
+Usability & Polished GUI, auto-reports & Streamlined multi-workstation & Dense interface, steep CLI curve \cite{Cybervie2021} \\
+\hline
+Cost (BE 2025) & €75k/year license; 2-3 shared & Subscription model & Free \\
+\hline
+Charleroi Use & Overflow cases despite backlog & 95\% success Samsung/iPhone & Never used \\
+\hline
+\end{tabular}
+\caption{Comparison of forensic tools for mobile geolocation analysis.}
+\label{tab:tools}
+\end{table}
+\subsection{Summary forensics and digital investigation}
+\label{secsotaforensicssummary}
+
+Forensic work on smartphone location traces focuses on how traces are generated, how long they persist, and how they can be recovered and analysed. Error classification separates systematic, random, and gross errors, with systematic errors dominating in digital forensics because of tool design and standardised procedures \cite{Nelson2015}. The three phases of production, persistence, and investigation introduce distinct points where accuracy can degrade and therefore require explicit evaluation.
+
+Location traces form essential digital evidence and arise from several sources. Dedicated positioning technologies generate explicit location records, while EXIF metadata, communication records, and browser history provide incidental but usable positioning information. Each source type has its own reliability profile, shaped by the acquisition process and how long the data remain stored.
+
+Strong encryption on Android (FDE/FBE) and iOS (filesystem-level encryption) constrains direct access to device contents. Commercial forensic platforms such as Cellebrite UFED and Magnet AXIOM offer extensive extraction functions with validated workflows, but their licensing costs restrict availability to some agencies. Open-source tools like Autopsy and ALEAPP reduce financial barriers but provide fewer specialised features, depend on community support, and often require root access. Successful investigations rely on choosing suitable tools, validating them regularly, and understanding the technical mechanisms that create and store traces.
+
+\section{Network and positioning technologies}
+\label{secnetworkpositioning}
+
+\subsection{Different types of positioning technologies}
+\label{secsotalocationtracetypes}
+
+Positioning technologies generate location traces with specific accuracy and reliability patterns.
+
+\textbf{Global Navigation Satellite Systems (GNSS):} GNSS receivers including GPS calculate position through satellite trilateration. Smartphones achieve positioning accuracy within a few meters under clear sky conditions \cite{Carney2025}. GNSS traces record latitude, longitude, elevation, speed, timestamps, and accuracy estimates that indicate signal quality \cite{Carney2025}. Direct line-of-sight to satellites proves essential; indoor and urban canyon environments severely attenuate signals.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.60\textwidth]{gps_trilateration.png}
+    \caption{GPS trilateration using satellite signals.\cite{olson2018gps}}
+    \label{fig:gps_trilateration}
+\end{figure}
+
+\textbf{Cellular networks:} Mobile phones generate Call Detail Records (CDRs) when connecting to cell towers. Location accuracy ranges from kilometers in rural areas to hundreds of meters in cities \cite{Oikonomidis2019}. Tower selection depends on frequency, density, power, obstacles, congestion, and weather \cite{Oikonomidis2019}. Sector coverage creates large uncertainty areas due to overlapping boundaries and handoffs between towers \cite{Mediaforensics2023}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{triangulation.png}
+    \caption{Cellular network triangulation for location estimation. A mobile device connects to multiple cell towers (Cell ID 1, 2, and 3) with varying signal strengths (RX1, RX2, RX3). The serving cell and signal measurements from adjacent cells enable triangulated location calculation \cite{damonam2012types}.}
+    \label{fig:cellular_triangulation}
+\end{figure}
+
+\textbf{WiFi positioning:} Devices measure WiFi signal strength from access points listed in crowd-sourced databases. Accuracy reaches 5-10 meters in good conditions \cite{Grow-space2025}. Database errors and directional biases toward populated areas limit reliability \cite{Spichiger2023}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{WIFI-Diagram04-RSSI-Fingerprinting.png}
+    \caption{Wi-Fi RSSI fingerprinting for indoor positioning. \cite{inpixon2024wifi}.}
+    \label{fig:wifi_rssi_fingerprinting}
+\end{figure}
+
+\textbf{Bluetooth Low Energy (BLE):} BLE beacons support RSSI-based fingerprinting with 1-5 meter accuracy \cite{Grow-space2025}. Bluetooth 5.1 adds Angle of Arrival for sub-meter precision \cite{Inpixon2024}.
+
+\textbf{Ultra-Wideband (UWB):} UWB measures precise time-of-flight distances with 10-30 cm accuracy indoors \cite{Grow-space2025}.
+
+\textbf{Combined methods:} Devices integrate multiple positioning sources. Cellular or WiFi provides coarse estimates. GNSS refines positions when available. Sensors maintain tracking during signal loss.
+
+\subsection{Cellular network geolocation measurement framework and influencing factors}
+\label{seccellulargeolocation}
+
+Cellular network signals complement satellite positioning in smartphone geolocation analysis. Signal propagation models, geometric constraints, and environmental effects determine the quality of cellular-based position solutions.
+
+
+\subsection{Summary network and positioning technologies}
+\label{secsotapositioningsummary}
+
+Cellular positioning determines device location by analyzing measurements from mobile network base stations to which the device connects. Unlike Global Navigation Satellite Systems (GNSS) that rely on satellite signals receivable only with clear sky visibility, cellular positioning leverages the wireless infrastructure already deployed globally for voice and data communications. This approach proves valuable in urban environments where GNSS signals are obstructed by buildings, in indoor environments where satellite signals are severely attenuated, and in forensic applications where multiple positioning modalities provide cross-validation.
+
+Cellular positioning operates through two primary mechanisms: explicit positioning services provided by network operators, and implicit positioning data generated during normal device-network communication \cite{CableFree2018}. Explicit mechanisms including Assisted GPS and network-based positioning services have been documented extensively. This master thesis focuses on implicit positioning information embedded in cellular signal measurements that devices must report to network infrastructure for cell selection, handover decisions, and signal quality assessment.
+
+\subsubsection{Signal measurement parameters}
+
+LTE devices measure signal characteristics from base station reference signals \cite{CableFree2018, ArImas2016}. Three main parameters support geolocation analysis.
+
+\textbf{Reference Signal Received Power (RSRP).} RSRP measures received power from one base station sector. Values appear in dBm units. The measure averages power across reference signal resource elements \cite{ArImas2016}. Readings range from -75 dBm close to towers to -120 dBm at coverage edges \cite{CableFree2018}. RSRP focuses on sector-specific power. It excludes interference from nearby sectors. This focus improves distance estimation compared to broadband measurements.
+
+\textbf{Reference Signal Received Quality (RSRQ).} RSRQ measures signal quality against noise and interference \cite{CableFree2018, ArImas2016}. The formula calculates:
+
+\[
+\text{RSRQ} = \frac{N \times \text{RSRP}}{\text{RSSI}}
+\]
+
+$N$ represents the number of physical resource blocks in the measurement bandwidth. RSRQ values span -14 dB to -8 dB in working networks. High values near -8 dB show clean conditions. Low values near -14 dB show noise or interference. Poor RSRQ increases uncertainty in distance calculations for positioning.
+
+\textbf{Received Signal Strength Indicator (RSSI).} RSSI measures total received power across the full bandwidth \cite{CableFree2018}. The total includes serving cell signals, neighbor cell interference, and noise:
+
+\[
+\text{RSSI} = 12 \times N \times \text{RSRP}
+\]
+
+This equation applies during full resource block activity and high signal-to-noise ratio \cite{CableFree2018}. RSSI covers too broad an area for precise distance estimation. Still, RSSI compared to RSRP reveals multipath and non-line-of-sight conditions.
+
+\textbf{Timing Advance (TA).} TA measures roundtrip delay between base station and device \cite{CableFree2018}. This delay gives direct distance estimates. No path loss model calibration is needed. TA resolution spans meters to tens of meters per step. TA pairs effectively with RSRP data to improve trilateration solutions.
+
+
+\subsubsection{Distance estimation: Path Loss propagation models}
+
+Signal strength converts to distance through propagation models \cite{Kurner2017}. Free space signals decay with $d^{-2}$ where $d$ is distance. Real environments add obstacles. The path loss equation captures this:
+
+\[
+\text{Path Loss (dB)} = A + 10n \log_{10}(d)
+\]
+
+$A$ sets reference loss at 1 meter. $n$ is the path loss exponent. $d$ measures distance in meters \cite{Kurner2017, Vo2024}. Distance solves as:
+
+\[
+d = 10^{(A - \text{RSRP})/(10n)}
+\]
+
+RSRP uses dBm units \cite{Vo2024}. The exponent $n$ reflects environment type. Free space uses $n = 2$. Urban areas use $n = 3.5$ to $5.5$ \cite{Kurner2017}. Dense urban canyons reach highest values.
+
+Frequency affects propagation. Lower bands at 700 MHz show $n \approx 3.5$-$4.0$ \cite{Kurner2017, Vo2024}. Higher bands at 2.6 GHz show $n \approx 5.0$-$5.7$ \cite{Kurner2017, Vo2024}. Separate calibration per frequency band increases accuracy.
+
+\subsubsection{Bearing and directional information}
+
+Base stations deploy three-sector antennas covering 120° each \cite{CableFree2018}. Antenna azimuth spans 0° to 360°. This marks each sector's main beam direction. Main lobe signals yield high RSRQ. Side lobe signals show lower RSRQ. Devices align near the antenna azimuth \cite{CableFree2018}.
+
+Serving cells provide bearing estimates with ±30-60° uncertainty \cite{CableFree2018}. Neighbor cells give mainly distance data. Their side lobe signals degrade RSRQ heavily. Bearing uncertainty reaches ±90° or more.
+
+Multiple cells combine distance and bearing data. Distance creates circles around towers. Bearing adds directional wedges. Both factors with confidence levels refine position estimates.
+
+\subsubsection{Geometric quality: Dilution of precision framework}
+
+Geometric Dilution of Precision (GDOP) measures base station geometry impact \cite{Wikipedia2004}. Same measurement accuracy yields different errors by tower layout. GDOP acts as error amplification factor:
+
+\[
+\text{GDOP} = \frac{\Delta(\text{position})}{\Delta(\text{measurement})}
+\]
+
+GDOP = 1 shows optimal geometry \cite{Wikipedia2004}. Values of 5-10 work well. Values of 10-20 perform adequately. Values above 20 degrade results.
+
+Towers surrounding devices at 120° angles minimize GDOP \cite{Ramadhani2020}. Collinear towers with devices maximize GDOP. Urban streets cluster towers linearly. Sparse areas spread towers widely. Device movement changes geometry over time \cite{Ramadhani2020}.
+
+\subsubsection{Signal degradation mechanisms: Multipath and NLOS}
+
+Multiple signal paths cause multipath. Direct paths combine with reflections \cite{NCBI2024}. Reflections delay arrival. Delayed signals distort direct signals. RSRP, RSRQ, and distance estimates shift.
+
+RSSI compared to RSRP detects multipath. Large RSSI-RSRP differences show interference \cite{NCBI2024}. RSRQ below expected values confirms multipath presence.
+
+Obstacles block direct paths in NLOS conditions. Signals diffract or reflect around barriers. Path length increases. Attenuation grows. Path loss models fail without line-of-sight assumptions.
+
+NLOS reduces RSRQ at equal power levels \cite{NCBI2024}. RSRP mismatches distance predictions. RSSI-RSRP spread plus RSRQ drop signals NLOS conditions.
+
+\subsubsection{Trilateration: Geometric position computation}
+
+\textbf{Distance circle intersection}
+
+Each distance measurement defines a circle of possible positions. Three non-collinear circles intersect at one point, the estimated position. More measurements produce overdetermined systems. Algorithms select the point minimizing residual error across all circles.
+
+Bearing information adds wedge-shaped constraints. Combined distance and bearing narrower the solution space compared to distance alone.
+
+\textbf{Residual error and solution optimization}
+
+Overdetermined systems (four+ measurements) require optimization. Least-squares algorithms minimize total residual error weighted by measurement confidence. This produces position estimates with associated residuals and quality metrics.
+
+
+\subsection{Summary: Network and positioning technologies}
+\label{sec:sota_positioning_summary}
+
+Positioning technologies operate on different principles. GNSS trilaterates satellites. Cellular networks use base station geometry. WiFi draws from access point databases. BLE fingerprints signal strength. UWB calculates time-of-flight \cite{Carney2025, Oikonomidis2019, Grow-space2025, Inpixon2024}.
+
+Accuracy spans wide ranges by environment:
+\begin{itemize}
+\item GNSS hits meter-scale in clear sky. Indoor failure follows.
+\item Cellular spans 200-800 m urban. Kilometers mark rural limits.
+\item WiFi delivers 5-10 m reliably.
+\item BLE achieves 1-5 m precision.
+\item UWB reaches 10-30 cm indoors.
+\end{itemize}
+
+Environment limits methods differently. GNSS requires satellite line-of-sight. Cellular positioning encounters sector overlap and multipath interference. WiFi accuracy relies on complete databases. Multipath affects all technologies.
+
+Frequency influences propagation significantly. Lower bands penetrate obstacles effectively. Path loss exponents range from 3.5 to 5.7 across frequency bands and terrain types \cite{Kurner2017, Vo2024}.
+
+Hybrid positioning enhances reliability. GNSS excels outdoors. Cellular networks function indoors. WiFi provides supplementary data. Sensor fusion selects optimal signals dynamically.
+
+Geometry amplifies errors via GDOP metrics \cite{Wikipedia2004, Ramadhani2020}. GDOP values of 1 indicate optimal tower arrangement. Scores from 5-10 support good performance. Values above 20 cause substantial degradation.
+
+Multipath combines direct signals with reflections from structures. NLOS propagation routes signals around obstacles, extending path lengths \cite{NCBI2024}. RSSI-RSRP differences reveal these impairments.
+
+Trilateration weights signals by RSRQ quality. Strong signals influence position calculations more heavily. Degraded signals contribute minimally.
+
+GDOP below 10 paired with clean signals produces 50-150 meter uncertainty. Poor geometry reaches 200-800 meter errors \cite{CableFree2018}.
+
+Forensic work demands awareness of these limits. Analysts quantify environmental effects precisely. Uncertainty reporting maintains evidence integrity.
+

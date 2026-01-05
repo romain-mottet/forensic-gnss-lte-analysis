@@ -1,0 +1,90 @@
+{
+  "277": {
+    "pci": "277",
+    "latitude": 50.669576891,
+    "longitude": 4.616264081,
+    "band": 7,
+    "operator": 4,
+    "frequency_mhz": "2630 MHz"
+  },
+  "279": {
+    "pci": "279",
+    "latitude": 50.669576891,
+    "longitude": 4.616264081,
+    "band": 28,
+    "operator": 4,
+    "frequency_mhz": "783 MHz"
+  },
+  "154": {
+    "pci": "154",
+    "latitude": 50.665910558,
+    "longitude": 4.623868952,
+    "band": 20,
+    "operator": 51,
+    "frequency_mhz": "806 MHz"
+  },
+  "156": {
+    "pci": "156",
+    "latitude": 50.665910558,
+    "longitude": 4.623868952,
+    "band": 28,
+    "operator": 52,
+    "frequency_mhz": "783 MHz"
+  },
+  "257": {
+    "pci": "257",
+    "latitude": 50.669576891,
+    "longitude": 4.616264081,
+    "band": 20,
+    "operator": 85,
+    "frequency_mhz": "806 MHz"
+  },
+  "85": {
+    "pci": "85",
+    "latitude": 50.669576891,
+    "longitude": 4.616264081,
+    "band": 3,
+    "operator": 28,
+    "frequency_mhz": "1815 MHz"
+  },
+  "437": {
+    "pci": "437",
+    "latitude": 50.82113543622669,
+    "longitude": 4.390007397996868,
+    "band": 20,
+    "operator": 4,
+    "frequency_mhz": "806 MHz"
+  }, 
+  "288": {
+    "pci": "288",
+    "latitude": 50.8255436,
+    "longitude": 4.385143,
+    "band": 20,
+    "operator": 4,
+    "frequency_mhz": "806 MHz"
+  },
+  "276": {
+    "pci": "276",
+    "latitude": 50.669576891,
+    "longitude": 4.616264081,
+    "band": 7,
+    "operator": 4,
+    "frequency_mhz": "2630 MHz"
+  },
+  "114": {
+    "pci": "114",
+    "latitude": 50.6755991,
+    "longitude": 4.6211031,
+    "band": 20,
+    "operator": 4,
+    "frequency_mhz": "2630 MHz"
+  },
+  "440": {
+    "pci": "440",
+    "latitude": 50.8213055,
+    "longitude": 4.3906937,
+    "band": 3,
+    "operator": 4,
+    "frequency_mhz": "1837.5 MHz"
+  }
+}

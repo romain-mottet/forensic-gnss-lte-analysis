@@ -1,0 +1,239 @@
+\chapter{Methodology}
+\label{chap:methodology}
+
+This chapter evaluates the framework from Chapter~3 against the research questions RQ1 and RQ2 defined in Section~\ref{sec:intro_research_questions}. 
+RQ1 measures smartphone GNSS accuracy by comparing device coordinates with Garmin Venu Sq~2 references and EXIF-derived waypoints, while RQ2 validates LTE signal-based distance models used for trilateration in the absence of GPS. 
+
+The analysis relies on 15 data-collection sessions conducted across 3 Belgian environments. 
+Urban measurements took place in Ixelles (Brussels Capital Region), suburban routes followed predefined paths in Louvain-la-Neuve (Brabant Wallon), and rural tracks were recorded around Waha (Luxembourg Province). 
+Each $\approx$ 800~m walk included five fixed waypoints: start, photo1, photo2, photo3, and end, ensuring repeated observations at the same physical locations. 
+
+Sessions occurred on different dates and at varied times of day in order to capture changes in satellite geometry, weather conditions, and network behaviour.
+
+\section{Experimental setup}
+
+The test configuration follows the final device selection from Section~\ref{sec:exp_device_journey}. Forensic reproducibility guides this setup.
+
+\begin{itemize}
+\item \textbf{Smartphone:} OnePlus 6T runs LineageOS 22.2 (Android 15). Magisk v29 provides root access. G-NetTrack Pro v0.375 logs networks at 6~s intervals. Logs include IMSI/IMEI/MSISDN and full cell data in verbose mode. Camera photos embed EXIF GPS metadata. These serve as primary forensic ground truth.
+\item \textbf{Smartwatch:} Garmin Venu Sq 2 delivers independent GNSS reference. GPX track export enables cross-validation. Smartphone Android location APIs stay excluded.
+
+\item \textbf{Forensic workstation:} ADB root extraction produces tar.gz filesystem archives. Autopsy 4.22.1 processes these with aLEAPP. Output creates ground\_truth\_waypoints.csv. This file holds EXIF coordinates, timestamps, and session metadata tied to physical locations.
+\end{itemize}
+
+A strict protocol prepares devices before each series. Factory reset clears persistent state. Disabled WiFi/Bluetooth scanning blocks assisted positioning artifacts. Manual time sync aligns timestamps across devices.
+
+See Annex~\ref{annex:device-prep} for full preparation details.
+
+\section{Field data collection protocol}
+Each session follows a standardized procedure ensuring comparability across environmental conditions and repetitions:
+
+\begin{enumerate}
+    \item \textbf{Initialization:} Confirm GPS lock accuracy $\leq$10~m, launch G-NetTrack Pro logging, start Garmin activity recording, and document cloud coverage on 0--5 scale (0=clear sky, 5=overcast) as primary environmental covariate.
+    \item \textbf{Route execution:} Traverse waypoints in fixed sequence taking timestamped photographs (EXIF ground truth); between photo2 and photo3, activate Google Maps navigation to a nearby shop simulating realistic foreground application usage that influences background location behavior.
+    \item \textbf{Repetition:} Conduct five sessions per environment on different days/times capturing diurnal satellite geometry variations and network load differences.
+\end{enumerate}
+
+This protocol generates synchronized multimodal datasets: raw LTE/GPS logs, Garmin GPX tracks, forensic EXIF waypoints, and environmental metadata enabling comprehensive geolocation quality assessment.
+
+\section{Analysis pipeline}
+Figure~\ref{fig:diagram} shows the three-stage workflow. Raw field data transforms into forensic positioning metrics. Custom scripts from Chapter 3 process EXIF waypoints, GPS comparisons, LOFO regression, and LTE trilateration.
+
+\begin{figure}[htbp]
+    \centering
+    \hspace*{-2cm}
+    \includegraphics[width=1.2\textwidth]{figures/diagram.pdf}
+     \caption{Three-stage pipeline: field collection → forensic extraction → Different python script analysis.}
+    \label{fig:diagram}
+\end{figure}
+
+\subsection{Stage 1: GPS comparison pipeline (12 Steps)}
+
+The GPS analysis pipeline executes twelve sequential steps to validate and compare smartphone and Garmin watch GPS tracks against ground-truth waypoints. These steps convert raw data, align timestamps optimally, flag quality issues, compute accuracy metrics, and generate visualizations.
+
+Parameters such as time windows (0.5--8.0~s), offsets ($\leq$3600~s), gaps ($\geq$12~s unstable, $\geq$60~s major), waypoint matching (25~s), and phone-watch agreement (10~m) are tuned for this experiment but can be adjusted based on context and desired outcomes. The pipeline code is modular, with all key parameters centralized in a dedicated configuration file (src/config/parameters.py) that allows easy modifications without altering the core implementation.
+
+\begin{enumerate}
+    \item \textbf{GPX to CSV conversion}: Recursively locate all Garmin watch .gpx files and convert them to CSV format (gps\_groundtruth.csv), preserving timestamps, coordinates, and accuracy fields like HDOP where available.
+   
+    \item \textbf{Optimal time window detection}: For each smartphone-watch pair, test alignment windows from 0.5 to 8.0 seconds in 0.5-second increments to identify the window maximizing match density.
+   
+    \item \textbf{Smartphone-watch merging}: Merge datasets using the optimal window and correct clock offsets up to 3600 seconds (1 hour) to handle DST changes; reject pairs exceeding this limit. Output per-session comparison files.
+   
+    \item \textbf{Quality gap analysis}: Scan merged files for duplicate timestamps and gaps, flagging unstable gaps $\geq$12 seconds and major gaps $\geq$60 seconds. Generate quality reports.
+   
+    \item \textbf{Data flagging}: Add quality flags to comparison data, including ``iscacheduplicate'' for duplicates and ``nearmajorgap30s'' for records within 30 seconds of major gaps.
+   
+    \item \textbf{Unified dataset creation}: Concatenate flagged files across sessions, enrich with metadata like cloud coverage from waypoints, and produce unified\_gps\_dataset.csv.
+   
+    \item \textbf{Waypoint distance matching}: Match GPS fixes to ground-truth waypoints within 25-second temporal windows, computing Haversine distances between coordinates. Generate per-session accuracy reports.
+   
+    \item \textbf{Global device accuracy}: Aggregate waypoint distances to compute per-device metrics: CEP (50th percentile), R95 (95th percentile), and RMSE.
+   
+    \item \textbf{Accuracy by location}: Stratify accuracy metrics (CEP, R95, RMSE) by location for environmental context.
+   
+    \item \textbf{Accuracy by cloud coverage}: Group metrics by cloud coverage categories (0=clear to 5=overcast) to assess environmental impact.
+   
+    \item \textbf{Phone-Watch agreement}: At aligned timestamps, flag instances where both devices report positions within 10 meters of each other.
+   
+    \item \textbf{Visualization generation}: Produce six PDF figures, including accuracy heatmaps, scatter plots, boxplots, and trends by location, device, and cloud coverage.
+\end{enumerate}
+
+\subsection{Stage 2: LTE distance regression}
+\label{stage:lte-distance-regression}
+
+This pipeline estimates LTE cell tower distances from signal measurements (RSRP, RSRQ, EARFCN) using parsed logs from stage 3. It associates measurements with ground-truth tower locations, engineers features, performs Leave-One-File-Out (LOFO) cross-validation, selects optimal models, and exports formulas in json formula directly usable in stage 3.
+
+\begin{enumerate}
+    \item \textbf{Input data ingestion}: Load parsed LTE measurement CSV files (parsed\_*.csv) containing timestamps, GPS coordinates, RSRP, RSRQ, PCI, and EARFCN for serving/neighbor cells.
+   
+    \item \textbf{Tower database joining}: Match measurements to tower locations using primary key (PCI + EARFCN) from towers.json; fallback to PCI-only matching via pci.json if enabled. Flag and exclude unmatched entries.
+   
+    \item \textbf{Ground-truth distance computation}: Calculate Haversine distances \(d_{\text{true}}\) (in meters) between receiver GPS and matched tower coordinates.
+   
+    \item \textbf{Log-space target framing}: Transform distances to \(y = 10 \log_{10}(d_{\text{true}})\) to stabilize variance, enforce positivity, and align with log-distance path loss models.
+   
+    \item \textbf{Feature engineering}: Prepare linear features (RSRP, RSRQ, EARFCN$_k$/1000) or nonlinear expansions (squares: rsrpsq/rsrqsq; interaction: rsrpxearfcnk). Limit to max 18 neighbors (limit from G-NetTrack Pro), per timestamp, filtering non-LTE.
+   
+    \item \textbf{LOFO Cross-Validation}: Perform Leave-One-File-Out validation rotating across measurement files per environment/context to test generalization.
+   
+    \item \textbf{Model evaluation and selection}: Fit linear regression models per fold; select the best minimizing MAE, RMSE, and MAPE across baseline and nonlinear variants. Log detailed per-fold metrics.
+   
+    \item \textbf{Formula export}: Save optimal model as formula\_*.json with coefficients (e.g., intercept 0.9427, coefrsrp -0.00038), features, and notes for downstream use.
+\end{enumerate}
+
+
+\subsection{Stage 3: LTE network positioning (9 Phases)}
+
+The LTE positioning pipeline runs nine phases. Four environmental contexts guide it: \textbf{default}, \textbf{town}, \textbf{city}, \textbf{village}. See Section~\ref{subsec:env_contexts}. Stage 2 formula variants feed Phase 2.2 for distance estimates. These enable model comparisons. Outputs match Haversine distances and GPS ground truth. Path-loss random errors beat formula precision in trilateration. Bias explains this.
+
+\subsubsection{Environment contexts: assumptions and parameter calibration}
+\label{subsec:env_contexts}
+
+Propagation environment shapes LTE accuracy. Signal geometry matters too. Four contexts handle this: \textbf{default}, \textbf{city}, \textbf{town}, \textbf{village}. Each sets parameters for signal traits and cell density. Contexts set Phase 2.2 distance uncertainty. They also control Phase 3.1--3.2 trilateration limits.
+
+\paragraph{Path Loss exponent and distance estimation}
+
+All contexts use this path-loss model:
+\begin{equation}
+d = 10^{\frac{\text{RSRP}{\text{ref}} - \text{RSRP}{\text{meas}}}{10n} + h(\text{RSRQ})}
+\end{equation}
+
+$n$ is the path-loss exponent. It spans 2.7-2.82 for LTE bands 700--2600 MHz. ITU-R M.1225 and 3GPP TS 36.942 provide data~\cite{ITU-R:2008, 3GPP:2023}. Exponents stay fixed across contexts. Contexts adjust distance uncertainty bounds instead. RSRP quality sets these bounds. Band physics reuse holds. Environmental signal stability varies.
+
+\paragraph{Signal quality and uncertainty classification}
+
+RSRP falls into six levels. Thresholds apply everywhere:
+\begin{itemize}
+\item \textbf{EXCELLENT} ($\text{RSRP} > -85 \text{ dBm}$): Near-tower. Fading variance $\pm$2--5 dB.
+\item \textbf{HIGH} ($-85$ to $-100$ dBm): Moderate multipath. Fading variance $\pm$5--10 dB.
+\item \textbf{GOOD} ($-100$ to $-110$ dBm): Non-line-of-sight. Fading variance $\pm$8--12 dB.
+\item \textbf{MEDIUM} ($-110$ to $-120$ dBm): Multipath and shadowing. Fading variance $\pm$15--20 dB.
+\item \textbf{WEAK} ($-120$ to $-130$ dBm): Coverage edge. Variance unpredictable.
+\item \textbf{VERY_WEAK} ($< -130$ dBm): Extreme edge. Estimates fail.
+\end{itemize}
+
+Max uncertainty in meters shifts by context. Cities use 80-250 m. Dense towers help. Villages use 100-400 m. Sparse coverage demands this. Towns take middle values.
+
+\paragraph{City context}
+
+High tower density overlaps coverage. Strong signals select easily. Max cells $= 8$. $\text{GDOP}_{\text{max}} = 8.0$.
+\begin{itemize}
+\item $> 6$ cells visible. Pick 4-8 strongest.
+\item Urban canyons raise $n \approx 2.8$. Matches 3GPP UMi.
+\item Filter RSRP at $-110$ dBm.
+\item GDOP $\leq 8.0$. Convergence 0.5 m.
+\item Bounds cut 20 m from default. HIGH: 100 m.
+\end{itemize}
+
+\paragraph{Town context}
+
+Moderate density mixes line-of-sight and non-line-of-sight. Max cells $= 6$. $\text{GDOP}_{\text{max}} = 9.0$.
+\begin{itemize}
+\item 3-6 cells visible.
+\item Multipath moderate.
+\item Filter RSRP at $-115$ dBm.
+\item GDOP $\leq 9.0$. Convergence 0.75 m.
+\item Bounds cut 10--20 m. HIGH: 110 m.
+\end{itemize}
+
+\paragraph{Village context}
+
+Sparse coverage means large cells. Max cells $= 5$. $\text{GDOP}_{\text{max}} = 10.0$.
+\begin{itemize}
+\item 2--5 cells visible. Min cells $=2$.
+\item Terrain raises $n \approx 3.5$-$4.0$. Fits 3GPP RMa.
+\item Filter RSRP at $-120$ dBm.
+\item GDOP $\leq 10.0$. Convergence 1.0 m.
+\item Bounds match default. HIGH: 120 m.
+\end{itemize}
+
+\paragraph{Default context}
+
+Baseline matches village. Max cells $= 5$. $\text{GDOP}_{\text{max}} = 10.0$. Use without context.
+
+\paragraph{Bearing and trilateration weighting}
+
+Solver weights by $w_i = 1/\sigma_i^2$. Phase 2.2 sets $\sigma_i$. This favors strong cells. GDOP filters bad geometry post-solution.
+
+\paragraph{Parameters setup}
+
+Files algorithm\_params.py and helpers\_config.py tune parameters. RSRP thresholds. Cell filters. GDOP $\leq8.0$. Weights. Changes avoid core code edits. Path-loss works. Stage 2 formulas ($d = 10^y$) fit. Batch and hybrid modes run.
+
+\subsubsection{pipeline phases:}
+
+\begin{enumerate}
+\item \textbf{Phase 1.1: Parse LTE logs}: G-NetTrack .txt to parsed\_*.csv. Add timestamps, GPS, RSRP, RSRQ, PCI, EARFCN.
+
+\item \textbf{Phase 1.2: Tower coverage verification}: Match to towers.json/pci.json. Flag unmatched cells in reports.
+
+\item \textbf{Phase 2.1: Signal extraction}: Clean RSRP/RSRQ to signaldata.csv, metadata.csv. Apply thresholds.
+
+\item \textbf{Phase 2.2: Distance estimation}: Path-loss (Friis) or Stage 2 ($d = 10^y$). Context-specific.
+
+\item \textbf{Phase 2.2.5: Distance ground-truth validation}: Haversine check. MAE, RMSE, CEP, R95, bias. Report output.
+
+\item \textbf{Phase 2.3: RSRQ-Weighted bearings}: Bearings from signals and distances.
+
+\item \textbf{Phase 3.1: Trilateration preparation}: 4--8 cells. GDOP $\leq$8.0. RSRP thresholds.
+
+\item \textbf{Phase 3.2: Weighted Least-Squares solving}: Minimize $\sum w_i (d_{\text{measured}} - d_{\text{model}})^2$. $w_i = 1/\sigma_i^2$.
+
+\item \textbf{Phase 3.3: Position ground-truth validation}: GPS match. MAE, RMSE, CEP, R95, bias, GDOP. Output accuracysummary.txt.
+\end{enumerate}
+
+\section{Evaluation metrics}
+
+Metrics quantify GNSS and LTE positioning accuracy, distinguishing systematic bias from random errors per Chapter 2 taxonomy.
+
+\subsection{GNSS (Stage 1)}
+Haversine distances measure errors from GPS fixes to EXIF-ground-truth waypoints.
+- \textbf{CEP}: 50th percentile radius containing half of errors.
+- \textbf{R95}: 95th percentile radius for extremes.
+- \textbf{RMSE}: Root mean square error against Garmin watch references.
+Phone-watch agreement flags co-located positions within 10~m.
+
+\subsection{LTE distance (Stage 2 \& Phase 2.2/2.2.5)}
+Regression models report errors in log-space predictions ($y = 10\log_{10}(d_{\text{true}}$)).
+- \textbf{MAE}: Mean absolute error.
+- \textbf{RMSE}: Root mean square error.
+- \textbf{MAPE}: Mean absolute percentage error.
+Phase 2.2.5 adds bias detection for overfitting (e.g., systematic 90~m underestimation).
+
+\subsection{LTE position (Phase 3.3)}
+Trilateration outputs validate against GPS ground truth.
+- \textbf{CEP}/\textbf{R95}/\textbf{RMSE}: As above, for 2D positions.
+- \textbf{Bias}: Mean signed error, highlighting directional offsets.
+- \textbf{GDOP}: Geometric Dilution of Precision distributions (target $\leq$8.0).
+
+\section{Quality assurance}
+
+Automated controls ensure pipeline reliability across GNSS and LTE stages, with logging for reproducibility in default/town/city/village contexts.
+
+- \textbf{Clock synchronization}: Correct offsets $\leq$3600~s (1 hour, DST-tolerant) via optimal windows (0.5--8.0~s).
+- \textbf{Data cleaning}: Flag GPS gaps ($\geq$12~s unstable, $\geq$60~s major, 30~s proximity); tower coverage verification with discrepancy reports.
+- \textbf{Overfitting prevention}: LOFO cross-validation in Stage 2 rotates across files.
+- \textbf{Geometry filtering}: Trilateration rejects GDOP $>$8.0, limits 4--8 cells.
+- \textbf{Distance validation}: Phase 2.2.5 benchmarks MAE/RMSE vs. Haversine truths.
+- \textbf{Dependency logging}: Phase-by-phase outputs (e.g., parsed\_*.csv, distanceestimates.csv) enable modular debugging.
+- \textbf{Config Reproducibility}: Centralized params.py/algorithm\_params.py for environment-specific tuning.

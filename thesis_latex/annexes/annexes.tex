@@ -1,0 +1,101 @@
+\chapter{Annexes}
+
+\section{Device reset and preparation procedure}
+\label{annex:device-prep}
+
+This annex details the exact protocol for resetting the OnePlus 6T (LineageOS 22.2 / Android 15) before each data collection session.
+
+\subsection{Initial setup}
+\begin{enumerate}
+\item Perform factory reset.
+\item Skip Mobile Network and Wi-Fi during OOBE.
+\item Set date/time manually if needed.
+\item Enable Google Services.
+\item Set PIN to 1234.
+\item Skip fingerprint and data restore.
+\item Complete LineageOS setup.
+\item \textit{If Google Services enablement fails:} Grant permissions via:
+\begin{verbatim}
+adb shell pm grant com.google.android.gms android.permission.ACCESS_COARSE_LOCATION
+adb shell pm grant com.google.android.gms android.permission.ACCESS_FINE_LOCATION
+\end{verbatim}
+\end{enumerate}
+
+\subsection{Connectivity}
+\begin{enumerate}
+\item Enable Geolocation for camera app.
+\item Connect to Wi-Fi.
+\item Sign into project Google Account (no backup restore).
+\item Restart device if prompted.
+\item Open Google Maps. Authorize "While using app" location.
+\item Verify location lock in Maps.
+\end{enumerate}
+
+\subsection{Developer options}
+\begin{enumerate}
+\item Enable Developer Options.
+\item Disable Wi-Fi Scanning and Bluetooth Scanning.
+\item Enable USB Debugging and Rooted Debugging.
+\end{enumerate}
+
+\subsection{Rooting}
+\begin{enumerate}
+\item Connect to PC. Allow file transfer.
+\item Copy magiskv29.0.apk and gnettrackpro.375.apk to storage.
+\item Disconnect USB.
+\item Install Magisk APK. Complete prompts. Reboot.
+\item Verify root: adb shell, then su. Grant Magisk popup.
+\end{enumerate}
+
+\subsection{G-NetTrack Pro configuration}
+\begin{enumerate}
+\item Install gnettrackpro.375.apk (bypass Play Protect).
+\item Launch app. Grant Always Allow location.
+\item Settings > Log Parameters:
+\begin{itemize}
+\item Timer Interval: 1s
+\item Include IMSI, IMEI, MSISDN: Enabled
+\item Verbose Log: Enabled
+\item Write Cell Info in Log: Enabled
+\item Ask for Log Name: Enabled
+\end{itemize}
+\end{enumerate}
+
+
+\section{Tower database construction}
+\label{annex:tower-database}
+
+Tower coordinates determine LTE trilateration accuracy. I built \texttt{towers.json} and \texttt{pci.json} through validation.
+
+\subsection{Dataset structure}
+\texttt{towers.json} uses Cell ID as key. Each entry holds \texttt{enb\_id}, corrected \texttt{latitude} and \texttt{longitude}, \texttt{pci}, \texttt{band}, \texttt{earfcn}, \texttt{azimuth}, and field signal data.
+
+\texttt{pci.json} uses PCI as key. Each entry holds \texttt{pci}, \texttt{latitude}, \texttt{longitude}, \texttt{band}, \texttt{operator}, and \texttt{frequency\_mhz}.
+
+\subsection{CellMapper problems}
+CellMapper supplied initial coordinates. Positioning errors remained high.
+
+\subsection{Quality check}
+Charleroi police supplied operator reports with addresses. I geolocated 50 antennas using Google Street View for ground truth.
+
+I have written a scripts that calculated Haversine errors. \texttt{cellmapper\_qa.py} reported RMSE 1166 m, median 471 m, max 3153 m. \texttt{extract\_outliers.py} flagged errors over 1000 m.
+
+41 of 50 cells had estimates. Mean error reached 834 m.
+
+\subsection{Official sources}
+Brussels permits came from geodata.environnement.brussels. Wallonia permits came from geoportail.wallonie.be.
+
+\subsection{Mapping steps}
+I matched official antennas to CellMapper eNBs. Position errors stayed below RMSE. Frequency bands aligned. Azimuths matched. CellMapper first-seen dates followed official installs. Addresses confirmed municipality and street.
+
+\subsection{Population steps}
+I assigned official \texttt{latitude} and \texttt{longitude} to matched eNBs in \texttt{towers.json}. CellMapper populated \texttt{enb\_id}, \texttt{pci}, \texttt{azimuth}, \texttt{band}, \texttt{earfcn}. G-NetTrack logs added signal data. I linked \texttt{pci.json} entries to corrected coordinates.
+
+\subsection{Acceptance rules}
+Official coordinates must exist. Matching passes all four criteria. I review errors over 1000 m.
+
+\subsection{Remaining errors}
+Official permits outperform raw CellMapper data. Antenna panel offsets create residual errors. Permit coordinates carry imprecision. Hybrid method improves positioning over CellMapper alone.
+
+
+

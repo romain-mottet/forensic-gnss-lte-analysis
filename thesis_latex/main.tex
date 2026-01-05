@@ -1,0 +1,188 @@
+\documentclass{EPL-master-thesis-covers-EN}
+
+% --------------------------------------------------
+%                 PACKAGES
+% --------------------------------------------------
+\usepackage{csquotes}              % Recommended with biblatex
+\usepackage{graphicx}              % Include graphics
+\usepackage{subcaption}            % Subfigures
+\usepackage{float}                 % Improved float control
+\usepackage{booktabs}              % Better tables
+\usepackage{array}                 % More table options
+\usepackage{amsmath,amssymb,amsfonts} % Math
+\usepackage{siunitx}               % Units
+\usepackage[hidelinks]{hyperref}   % Clickable links (no colors)
+\usepackage{url}                   % Better URL handling
+\usepackage{enumitem}              % Control over lists
+\usepackage{setspace}              % Line spacing
+\usepackage{caption}               % Caption control
+\usepackage{listings}              % Code listings
+\usepackage{xcolor}                % Colors for code
+\usepackage{svg}
+% --------------------------------------------------
+%      TABLE OF CONTENTS DEPTH CONFIGURATION
+% --------------------------------------------------
+\setcounter{tocdepth}{3}      % Show up to subsubsections in ToC
+\setcounter{secnumdepth}{3}   % Number up to subsubsections
+
+% --------------------------------------------------
+%            BIBLIOGRAPHY (BIBLATEX)
+% --------------------------------------------------
+\usepackage[
+    backend=biber,
+    style=numeric,
+    sorting=none,
+    maxbibnames=99
+]{biblatex}
+
+\addbibresource{refs.bib}
+
+% --------------------------------------------------
+%            GRAPHICS PATH
+% --------------------------------------------------
+\graphicspath{{figures/}}
+
+% --------------------------------------------------
+%            LISTINGS CONFIG (CODE)
+% --------------------------------------------------
+\lstset{
+    basicstyle=\ttfamily\small,
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=1,
+    numbersep=5pt,
+    showstringspaces=false,
+    frame=single,
+    breaklines=true,
+    tabsize=2,
+    captionpos=b,
+    commentstyle=\color{gray},
+    keywordstyle=\color{blue},
+    stringstyle=\color{red}
+}
+
+% --------------------------------------------------
+%            DOCUMENT METADATA (EPL FORMAT)
+% --------------------------------------------------
+% Title and subtitle
+\title{Smartphone positioning accuracy in forensic contexts}
+\subtitle{Satellite and cellular methods across Belgian environments}
+
+% Author (use \textsc{} for last name)
+\author{Romain \textsc{Mottet}}
+% \secondauthor{Second Author \textsc{Name}} % Uncomment if needed
+% \thirdauthor{Third Author \textsc{Name}}   % Uncomment if needed
+
+% Degree title (copy exactly from EPL list)
+\degreetitle{Master [120] in Computer Science and Engineering}
+
+% Supervisor(s)
+\supervisor{Ramin \textsc{Sadre}}
+% \secondsupervisor{Second Supervisor \textsc{Name}} % Uncomment if needed
+% \thirdsupervisor{Third Supervisor \textsc{Name}}   % Uncomment if needed
+
+% Readers
+\readerone{\textsc{Corentin Libert}}
+\readertwo{\textsc{Yinan Cao}}     % Uncomment if needed
+% \readerthree{Reader Three \textsc{Name}} % Uncomment if needed
+% \readerfour{Reader Four \textsc{Name}}   % Uncomment if needed
+% \readerfive{Reader Five \textsc{Name}}   % Uncomment if needed
+
+% Academic year
+\years{2025--2026}
+
+% --------------------------------------------------
+%            BEGIN DOCUMENT
+% --------------------------------------------------
+\begin{document}
+
+% Front cover page (uses \maketitle for EPL class)
+\maketitle
+
+% Roman numbering for front matter
+\pagenumbering{roman}
+
+% --------------------------------------------------
+%                ABSTRACT
+% --------------------------------------------------
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+This Master’s thesis validates smartphone geolocation reliability across forensic scenarios 
+in urban (Ixelles), suburban (Louvain-la-Neuve), and rural (Waha) Belgium. It 
+compares smartphone GNSS coordinates against two independent ground truth 
+references: a smartwatch (Garmin Venu Sq 2) and physical waypoints marked by 
+timestamped photographs. The thesis addresses two research questions: (RQ1) How 
+accurate is smartphone GNSS positioning relative to ground truth? and (RQ2) Can 
+cellular LTE signal strength reconstruct device locations without GPS? The 
+methodology independently validates satellite-based positioning (RQ1) through 
+comparative accuracy analysis, and develops network-based positioning methods 
+(RQ2) via empirical distance models and trilateration. This two-pronged approach 
+reflects forensic practice: GPS logs provide evidence of outdoor presence, while 
+LTE-based reconstruction serves scenarios where satellite signals are unavailable.
+
+
+\vspace{1em}
+\noindent\textbf{Open science resources}\\
+All research materials are available under the MIT license on GitHub. The repository includes analytical code, the complete experimental dataset, and the \LaTeX{} source of this document. Smartphone image files are not hosted due to their 4\,GB size each, but anyone needing them can contact me directly.
+
+\begin{center}
+  \url{https://github.com/romain-mottet/forensic-gnss-lte-analysis}
+\end{center}
+
+Researchers are invited to verify these results or extend the codebase for future forensic work.
+\clearpage
+
+% --------------------------------------------------
+%                ACKNOWLEDGEMENTS
+% --------------------------------------------------
+\chapter*{Acknowledgements}
+\addcontentsline{toc}{chapter}{Acknowledgements}
+
+I thank Professor Ramin Sadre for his guidance, expertise, and consistent support during this research. His feedback and critiques shaped the method, interpretation, and final quality of this thesis.
+
+I thank Jean-Yves Lepage for facilitating contact with the Police Judiciaire Fédérale de Charleroi and for sharing essential technical insights that supported this work.
+
+I also thank my family and friends for their constant encouragement and patience throughout the project. Their support kept me focused and motivated through demanding stages of the research.
+
+This thesis acknowledges the use of Generative AI (GAI) tools for language refinement and grammar correction, in line with Université Catholique de Louvain (UCLouvain) and École Polytechnique de Louvain (EPL) guidelines. The tools served only to improve readability. All ideas, analyses, and conclusions are entirely my own.
+
+\clearpage
+
+% --------------------------------------------------
+%                TABLE OF CONTENTS
+% --------------------------------------------------
+\tableofcontents
+\clearpage
+
+% Switch to Arabic numbering for main matter
+\pagenumbering{arabic}
+
+% --------------------------------------------------
+%                CHAPTERS
+% --------------------------------------------------
+\onehalfspacing % 1.5 line spacing for readability
+
+\include{chapters/introduction}
+\include{chapters/state_of_the_art}
+\include{chapters/experimental_framework}
+\include{chapters/methodology}
+\include{chapters/results}
+\include{chapters/conclusion}
+
+% --------------------------------------------------
+%                BIBLIOGRAPHY
+% --------------------------------------------------
+\clearpage
+\printbibliography[heading=bibintoc]
+
+% --------------------------------------------------
+%                ANNEXES
+% --------------------------------------------------
+\appendix
+\include{annexes/annexes}
+
+% Back cover page
+\backcoverpage
+
+\end{document}
